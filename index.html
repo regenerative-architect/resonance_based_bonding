@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonance — A Field Atlas of Human Bonding</title>
+<meta name="description" content="An interdisciplinary research atlas on the neuroscience, psychology, and civic life of human bonding — built for policymakers, educators, and students.">
+<style>
+/* =====================================================================
+   RESONANCE — DESIGN SYSTEM
+   -----------------------------------------------------------------
+   This stylesheet is organized as a set of layers, in this order:
+   1. Tokens        — color, type, spacing variables (the "materials")
+   2. Reset          — normalize default browser styling
+   3. Base           — html/body/typography defaults
+   4. Layout         — grid/flow primitives shared across sections
+   5. Components     — nav, HUD, splash, cards, constellation, search…
+   6. Section skins  — the unique visual texture of each content section
+   7. Print          — a distinct, ink-efficient stylesheet for paper
+   8. Motion & a11y  — prefers-reduced-motion, focus rings, etc.
+   Every component is commented where it starts, so you can jump to
+   the part you want to change with a text search for its heading.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. TOKENS
+   Two nervous systems, tuning toward each other, is the visual idea
+   behind this palette: a deep "internal" ink-blue base, a warm amber
+   glow standing in for the bonding/oxytocin system, and a cooler teal
+   standing in for the "other" person/oscillator a system synchronizes
+   with. Type pairs a manuscript serif (headlines, "field-notes" voice)
+   with a plain system sans (UI, body copy, dense reading).
+--------------------------------------------------------------------- */
+:root{
+  /* -- surfaces -- */
+  --ink-950:#0c1018;
+  --ink-900:#12182a;
+  --ink-850:#1a2340;
+  --ink-800:#212c4d;
+  --ink-border:#2b365a;
+  --ink-border-soft:#232d4d;
+
+  /* -- accents -- */
+  --amber:#e8a85c;
+  --amber-strong:#f4c989;
+  --amber-dim:#8a6a3d;
+  --teal:#6fb8c4;
+  --teal-strong:#9ad4de;
+  --teal-dim:#3f6b72;
+  --rose:#c97064;
+  --rose-dim:#7a453d;
+
+  /* -- text -- */
+  --bone:#ede7da;
+  --bone-dim:#b9b3a4;
+  --bone-faint:#7d7c86;
+  --dim:#5a6478;
+
+  /* -- type -- */
+  --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Noto Serif', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* -- scale -- */
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.92rem);
+  --step-0:  clamp(1rem, 0.95rem + 0.2vw, 1.1rem);
+  --step-1:  clamp(1.2rem, 1.1rem + 0.4vw, 1.4rem);
+  --step-2:  clamp(1.45rem, 1.3rem + 0.7vw, 1.85rem);
+  --step-3:  clamp(1.8rem, 1.5rem + 1.4vw, 2.6rem);
+  --step-4:  clamp(2.3rem, 1.8rem + 2.4vw, 3.6rem);
+  --step-5:  clamp(2.8rem, 2rem + 4vw, 5rem);
+
+  /* -- rhythm -- */
+  --content-w: 40rem;
+  --wide-w: 72rem;
+  --section-pad: clamp(4.5rem, 5vw + 2rem, 8.5rem);
+  --radius-s: 3px;
+  --radius-m: 6px;
+  --nav-h: 60px;
+
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------
+   2. RESET
+--------------------------------------------------------------------- */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body,h1,h2,h3,h4,p,figure,blockquote,dl,dd,ul,ol{ margin:0; }
+ul[role="list"],ol[role="list"]{ list-style:none; padding:0; }
+img,svg,canvas{ display:block; max-width:100%; }
+button,input{ font:inherit; color:inherit; }
+a{ color:inherit; }
+button{ background:none; border:none; cursor:pointer; }
+
+/* ---------------------------------------------------------------------
+   3. BASE
+--------------------------------------------------------------------- */
+body{
+  background:var(--ink-950);
+  color:var(--bone);
+  font-family:var(--font-body);
+  font-size:var(--step-0);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body.no-scroll{ overflow:hidden; height:100vh; }
+
+h1,h2,h3,h4{
+  font-family:var(--font-display);
+  font-weight:400;
+  line-height:1.15;
+  color:var(--bone);
+}
+h2{ font-size:var(--step-3); letter-spacing:-0.01em; }
+h3{ font-size:var(--step-2); }
+h4{ font-size:var(--step-1); font-family:var(--font-body); font-weight:600; }
+
+p{ max-width:var(--content-w); }
+p + p{ margin-top:1em; }
+
+.prose p, .prose li{ max-width:var(--content-w); color:var(--bone-dim); }
+.prose strong{ color:var(--bone); font-weight:600; }
+.prose a{ color:var(--amber-strong); text-decoration-color:var(--amber-dim); text-underline-offset:3px; }
+.prose a:hover{ text-decoration-color:var(--amber-strong); }
+
+::selection{ background:var(--amber-dim); color:var(--ink-950); }
+
+:focus-visible{
+  outline:2px solid var(--teal-strong);
+  outline-offset:3px;
+  border-radius:2px;
+}
+
+/* Scrollbar (webkit) — subtle, matches ink surface */
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:var(--ink-950); }
+::-webkit-scrollbar-thumb{ background:var(--ink-border); border-radius:6px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--dim); }
+
+/* ---------------------------------------------------------------------
+   4. LAYOUT PRIMITIVES
+--------------------------------------------------------------------- */
+.wrap{ max-width:var(--wide-w); margin-inline:auto; padding-inline:clamp(1.25rem,4vw,3rem); position:relative; }
+.col{ max-width:var(--content-w); }
+.section{ padding-block:var(--section-pad); position:relative; }
+.section-head{ margin-bottom:clamp(2rem,4vw,3.5rem); }
+.section-kicker{
+  display:flex; align-items:center; gap:.6rem;
+  color:var(--teal-strong); font-size:var(--step--1);
+  margin-bottom:.9rem;
+}
+.section-kicker .num{
+  font-family:var(--font-display); font-style:italic; color:var(--amber);
+  font-size:1.05em;
+}
+.section-kicker .line{ height:1px; width:2.25rem; background:var(--ink-border); }
+.section-index-line{ color:var(--dim); }
+
+.grid-2{ display:grid; gap:clamp(1.5rem,4vw,3.5rem); }
+@media(min-width:860px){ .grid-2{ grid-template-columns:1fr 1fr; } }
+.grid-3{ display:grid; gap:1.5rem; }
+@media(min-width:720px){ .grid-3{ grid-template-columns:repeat(3,1fr); } }
+
+hr.rule{ border:none; height:1px; background:var(--ink-border); margin-block:clamp(2rem,5vw,4rem); }
+
+/* A "card" used sparingly — not as a default kit, only where content is
+   genuinely a discrete, comparable unit (mechanism notes, evidence entries) */
+.card{
+  background:var(--ink-900);
+  border:1px solid var(--ink-border-soft);
+  border-radius:var(--radius-m);
+  padding:clamp(1.25rem,2.5vw,1.75rem);
+}
+
+/* ---------------------------------------------------------------------
+   5a. SPLASH SCREEN
+   Pure-CSS animated sequence so it degrades gracefully with JS off:
+   fades in, holds, then fades itself out and disables pointer events.
+   JS (below) layers a "skip" affordance and a returning-visitor bypass
+   on top of this baseline.
+--------------------------------------------------------------------- */
+#splash{
+  position:fixed; inset:0; z-index:200;
+  background:var(--ink-950);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:1.5rem;
+  animation:splashLifecycle 3.6s ease forwards;
+}
+#splash.js-skip{ animation-duration:.5s; }
+#splash.js-instant{ display:none; }
+@keyframes splashLifecycle{
+  0%{ opacity:1; }
+  78%{ opacity:1; }
+  96%{ opacity:0; }
+  100%{ opacity:0; visibility:hidden; pointer-events:none; }
+}
+#splash .wave-stage{ width:min(70vw,420px); height:120px; position:relative; }
+#splash svg{ width:100%; height:100%; overflow:visible; }
+#splash .wave-a{ stroke:var(--teal); }
+#splash .wave-b{ stroke:var(--amber); }
+#splash path{ fill:none; stroke-width:2; opacity:.85; }
+#splash .brand{
+  font-family:var(--font-display); font-size:var(--step-3);
+  letter-spacing:.01em; color:var(--bone);
+}
+#splash .tag{ color:var(--bone-faint); font-size:var(--step--1); text-align:center; max-width:26ch; }
+#splash .skip{
+  position:absolute; bottom:2.25rem; font-size:var(--step--1);
+  color:var(--dim); border:1px solid var(--ink-border); border-radius:999px;
+  padding:.5rem 1.1rem; opacity:0; animation:skipReveal .4s ease 1.4s forwards;
+}
+#splash .skip:hover{ color:var(--bone); border-color:var(--dim); }
+@keyframes skipReveal{ to{ opacity:1; } }
+
+@media(prefers-reduced-motion:reduce){
+  #splash{ animation-duration:.6s; }
+  #splash .wave-a, #splash .wave-b{ animation:none !important; }
+}
+
+/* ---------------------------------------------------------------------
+   5b. STICKY NAV / TOC
+--------------------------------------------------------------------- */
+#topnav{
+  position:sticky; top:0; z-index:80;
+  height:var(--nav-h);
+  display:flex; align-items:center;
+  background:rgba(12,16,24,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--ink-border-soft);
+}
+#topnav .wrap{ display:flex; align-items:center; gap:1rem; width:100%; height:100%; }
+.brandmark{
+  font-family:var(--font-display); font-size:1.15rem; color:var(--bone);
+  display:flex; align-items:center; gap:.5rem; white-space:nowrap;
+}
+.brandmark .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--amber); box-shadow:0 0 0 3px rgba(232,168,92,.18);
+}
+#progressbar{
+  position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background:var(--ink-border-soft);
+}
+#progressbar span{
+  display:block; height:100%; width:0%;
+  background:linear-gradient(90deg,var(--teal),var(--amber));
+  transition:width .12s linear;
+}
+.toc-toggle,.search-toggle{
+  display:flex; align-items:center; gap:.4rem;
+  font-size:var(--step--1); color:var(--bone-dim);
+  padding:.45rem .75rem; border-radius:999px; border:1px solid transparent;
+}
+.toc-toggle:hover,.search-toggle:hover{ border-color:var(--ink-border); color:var(--bone); }
+.nav-spacer{ flex:1; }
+.nav-hud-compact{
+  display:flex; align-items:center; gap:.6rem;
+  font-size:var(--step--1); color:var(--bone-dim);
+  border-left:1px solid var(--ink-border-soft); padding-left:1rem;
+}
+.nav-hud-compact .lvl{ color:var(--amber-strong); font-family:var(--font-display); font-style:italic; }
+.xp-track{ width:64px; height:5px; border-radius:3px; background:var(--ink-border); overflow:hidden; }
+.xp-track span{ display:block; height:100%; background:var(--teal); }
+@media(max-width:700px){ .nav-hud-compact .lvl-label, .brandmark .full{ display:none; } }
+
+/* ---------------------------------------------------------------------
+   5c. TOC SLIDE-OVER PANEL
+--------------------------------------------------------------------- */
+#toc-panel{
+  position:fixed; inset:0 auto 0 0; z-index:90;
+  width:min(320px,86vw); height:100vh;
+  background:var(--ink-900); border-right:1px solid var(--ink-border-soft);
+  transform:translateX(-100%); transition:transform .28s ease;
+  overflow-y:auto; padding:1.5rem 1.35rem;
+}
+#toc-panel.open{ transform:translateX(0); }
+#toc-panel h4{ color:var(--bone-faint); font-size:var(--step--1); margin-bottom:1rem; }
+#toc-panel ol{ display:flex; flex-direction:column; gap:.15rem; counter-reset:toc; }
+#toc-panel a{
+  display:flex; align-items:baseline; gap:.6rem;
+  padding:.5rem .4rem; border-radius:var(--radius-s);
+  color:var(--bone-dim); text-decoration:none; font-size:var(--step--1);
+  counter-increment:toc;
+}
+#toc-panel a::before{
+  content:counter(toc,decimal-leading-zero);
+  font-family:var(--font-display); font-style:italic; color:var(--dim);
+  font-size:.9em;
+}
+#toc-panel a:hover, #toc-panel a.active{ background:var(--ink-850); color:var(--bone); }
+#toc-panel a.active::before{ color:var(--amber); }
+#toc-scrim{
+  position:fixed; inset:0; z-index:85; background:rgba(8,10,16,.55);
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+#toc-scrim.open{ opacity:1; pointer-events:auto; }
+
+/* ---------------------------------------------------------------------
+   5d. GAMIFICATION HUD PANEL (expanded view)
+--------------------------------------------------------------------- */
+#hud-panel{
+  position:fixed; right:1rem; bottom:1rem; z-index:70;
+  width:min(300px,90vw);
+  background:var(--ink-900); border:1px solid var(--ink-border-soft);
+  border-radius:var(--radius-m); box-shadow:0 10px 40px rgba(0,0,0,.4);
+  transform:translateY(1rem) scale(.98); opacity:0; pointer-events:none;
+  transition:transform .2s ease, opacity .2s ease;
+  padding:1.1rem 1.15rem 1.3rem;
+}
+#hud-panel.open{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+#hud-panel .hud-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.6rem; }
+#hud-panel .hud-title{ font-family:var(--font-display); font-style:italic; color:var(--amber-strong); }
+#hud-panel .hud-close{ color:var(--dim); font-size:1.1rem; line-height:1; }
+#hud-panel .xp-row{ display:flex; align-items:center; gap:.6rem; font-size:var(--step--1); color:var(--bone-dim); margin-bottom:.85rem; }
+#hud-panel .xp-track{ flex:1; height:6px; }
+#badge-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:.4rem; }
+.badge{
+  aspect-ratio:1; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:var(--ink-850); border:1px solid var(--ink-border);
+  font-size:.95rem; color:var(--dim); position:relative;
+}
+.badge.earned{ background:radial-gradient(circle at 35% 30%,var(--amber-strong),var(--amber-dim)); color:var(--ink-950); border-color:transparent; }
+.badge[data-label]:hover::after{
+  content:attr(data-label); position:absolute; bottom:120%; left:50%; transform:translateX(-50%);
+  background:var(--ink-950); border:1px solid var(--ink-border); color:var(--bone);
+  padding:.3rem .55rem; border-radius:var(--radius-s); font-size:.72rem; white-space:nowrap; z-index:5;
+}
+#hud-fab{
+  position:fixed; right:1rem; bottom:1rem; z-index:69;
+  width:52px; height:52px; border-radius:50%;
+  background:var(--ink-900); border:1px solid var(--ink-border);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--amber-strong); font-family:var(--font-display); font-style:italic;
+  box-shadow:0 6px 24px rgba(0,0,0,.35);
+}
+#hud-fab:hover{ border-color:var(--amber-dim); }
+#hud-fab.open{ opacity:0; pointer-events:none; }
+
+/* ---------------------------------------------------------------------
+   5e. SEARCH OVERLAY
+--------------------------------------------------------------------- */
+#search-overlay{
+  position:fixed; inset:0; z-index:95;
+  background:rgba(8,10,16,.7); backdrop-filter:blur(3px);
+  display:flex; align-items:flex-start; justify-content:center;
+  padding-top:min(14vh,140px);
+  opacity:0; pointer-events:none; transition:opacity .18s ease;
+}
+#search-overlay.open{ opacity:1; pointer-events:auto; }
+#search-box{
+  width:min(560px,90vw); background:var(--ink-900);
+  border:1px solid var(--ink-border-soft); border-radius:var(--radius-m);
+  padding:1.1rem 1.2rem; max-height:70vh; display:flex; flex-direction:column;
+}
+#search-input{
+  width:100%; background:transparent; border:none; border-bottom:1px solid var(--ink-border-soft);
+  padding-bottom:.75rem; font-size:var(--step-1); color:var(--bone);
+}
+#search-input:focus{ outline:none; border-color:var(--amber-dim); }
+#search-input::placeholder{ color:var(--dim); }
+#search-results{ margin-top:.75rem; overflow-y:auto; display:flex; flex-direction:column; gap:.15rem; }
+#search-results a{
+  display:block; padding:.65rem .5rem; border-radius:var(--radius-s);
+  text-decoration:none; color:var(--bone-dim);
+}
+#search-results a:hover, #search-results a.active-result{ background:var(--ink-850); color:var(--bone); }
+#search-results .r-section{ font-size:.72rem; color:var(--teal-strong); display:block; margin-bottom:.15rem; }
+#search-results mark{ background:var(--amber-dim); color:var(--bone); border-radius:2px; padding:0 .1em; }
+#search-empty{ color:var(--dim); font-size:var(--step--1); padding:.75rem .5rem; }
+#search-hint{ color:var(--dim); font-size:.72rem; margin-top:.6rem; }
+
+/* ---------------------------------------------------------------------
+   5f. BUTTONS + COLLAPSIBLES
+--------------------------------------------------------------------- */
+.btn{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.7rem 1.3rem; border-radius:999px; font-size:var(--step--1);
+  border:1px solid var(--ink-border);
+}
+.btn-primary{ background:var(--amber); color:var(--ink-950); border-color:var(--amber); font-weight:600; }
+.btn-primary:hover{ background:var(--amber-strong); }
+.btn-ghost{ color:var(--bone-dim); }
+.btn-ghost:hover{ color:var(--bone); border-color:var(--dim); }
+
+details.deep-dive{
+  background:var(--ink-900); border:1px solid var(--ink-border-soft);
+  border-radius:var(--radius-m); padding:.2rem 1.1rem; margin-top:1.35rem;
+}
+details.deep-dive summary{
+  cursor:pointer; padding:.85rem 0; list-style:none;
+  display:flex; align-items:center; gap:.75rem;
+  font-family:var(--font-body); font-weight:600; color:var(--teal-strong);
+  font-size:var(--step--1);
+}
+details.deep-dive summary::-webkit-details-marker{ display:none; }
+details.deep-dive summary::before{
+  content:"+"; display:flex; align-items:center; justify-content:center;
+  width:1.3rem; height:1.3rem; border-radius:50%; border:1px solid var(--teal-dim);
+  color:var(--teal-strong); font-size:.9rem; flex-shrink:0; transition:transform .2s ease;
+}
+details.deep-dive[open] summary::before{ content:"–"; transform:rotate(180deg); }
+details.deep-dive .dd-body{ padding-bottom:1.1rem; }
+details.deep-dive .dd-body p{ color:var(--bone-dim); }
+
+/* ---------------------------------------------------------------------
+   6a. HERO
+--------------------------------------------------------------------- */
+#hero{
+  min-height:92vh; display:flex; flex-direction:column; justify-content:center;
+  position:relative; padding-top:calc(var(--nav-h) + 2rem);
+}
+#hero-wave{ position:absolute; inset:0; z-index:0; opacity:.55; pointer-events:none; }
+#hero-wave svg{ width:100%; height:100%; }
+#hero .wrap{ position:relative; z-index:1; }
+#hero h1{
+  font-size:var(--step-5); max-width:16ch; letter-spacing:-0.01em;
+}
+#hero .lede{ max-width:38ch; color:var(--bone-dim); font-size:var(--step-1); margin-top:1.4rem; }
+#hero .hero-meta{
+  display:flex; flex-wrap:wrap; gap:2.5rem; margin-top:3rem;
+  padding-top:2rem; border-top:1px solid var(--ink-border-soft);
+}
+#hero .hero-meta dt{ color:var(--dim); font-size:.75rem; margin-bottom:.3rem; }
+#hero .hero-meta dd{ color:var(--bone-dim); font-size:var(--step--1); max-width:22ch; }
+#hero .cta-row{ display:flex; gap:1rem; margin-top:2.75rem; flex-wrap:wrap; }
+.parallax-el{ will-change:transform; }
+
+/* ---------------------------------------------------------------------
+   6b. CONSTELLATION VISUALIZER
+--------------------------------------------------------------------- */
+#constellation-wrap{
+  background:var(--ink-900); border:1px solid var(--ink-border-soft);
+  border-radius:var(--radius-m); overflow:hidden;
+}
+#constellation-canvas{ width:100%; height:520px; display:block; touch-action:pan-y; cursor:pointer; }
+@media(max-width:640px){ #constellation-canvas{ height:420px; } }
+#constellation-legend{
+  display:flex; flex-wrap:wrap; gap:.5rem;
+  padding:1rem clamp(1rem,2vw,1.5rem) 1.25rem;
+  border-top:1px solid var(--ink-border-soft);
+}
+.node-chip{
+  font-size:.78rem; padding:.4rem .8rem; border-radius:999px;
+  border:1px solid var(--ink-border); color:var(--bone-dim);
+}
+.node-chip[aria-pressed="true"]{ background:var(--amber); color:var(--ink-950); border-color:var(--amber); }
+.node-chip.mech[aria-pressed="true"]{ background:var(--teal); color:var(--ink-950); border-color:var(--teal); }
+.node-chip.rupture[aria-pressed="true"]{ background:var(--rose); color:var(--ink-950); border-color:var(--rose); }
+#constellation-info{
+  padding:1.1rem clamp(1rem,2vw,1.5rem) 1.5rem; min-height:5.5rem;
+  border-top:1px solid var(--ink-border-soft);
+}
+#constellation-info .ci-title{ color:var(--amber-strong); font-family:var(--font-display); font-style:italic; font-size:var(--step-1); }
+#constellation-info p{ color:var(--bone-dim); margin-top:.5rem; max-width:60ch; }
+#constellation-info .ci-placeholder{ color:var(--dim); }
+.print-only-list{ display:none; }
+
+/* ---------------------------------------------------------------------
+   6c. REFLECTION / QUADRANT TOOL
+--------------------------------------------------------------------- */
+.reflect-disclaimer{
+  border-left:2px solid var(--teal-dim); padding-left:1rem; color:var(--bone-dim) !important;
+  font-size:var(--step--1); max-width:52ch;
+}
+#reflect-form{ margin-top:2rem; display:flex; flex-direction:column; gap:1.6rem; max-width:38rem; }
+.reflect-item p.prompt{ color:var(--bone); max-width:none; margin-bottom:.75rem; }
+.likert{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.likert label{
+  flex:1; min-width:4.2rem; text-align:center; font-size:.74rem; color:var(--bone-dim);
+  border:1px solid var(--ink-border); border-radius:var(--radius-s); padding:.55rem .3rem; cursor:pointer;
+}
+.likert input{ position:absolute; opacity:0; pointer-events:none; }
+.likert input:checked + label{ background:var(--teal-dim); border-color:var(--teal); color:var(--bone); }
+.likert label:hover{ border-color:var(--dim); }
+#reflect-result{
+  margin-top:1rem; display:none; gap:2rem; align-items:center; flex-wrap:wrap;
+}
+#reflect-result.show{ display:flex; }
+#quadrant-svg{ width:220px; height:220px; flex-shrink:0; }
+#quadrant-svg .axis{ stroke:var(--ink-border); stroke-width:1; }
+#quadrant-svg .qlabel{ fill:var(--dim); font-size:8px; font-family:var(--font-body); }
+#quadrant-svg .dot{ fill:var(--amber); }
+.reflect-readout h4{ color:var(--teal-strong); margin-bottom:.5rem; }
+
+/* ---------------------------------------------------------------------
+   6d. AUDIENCE TABS (Policy & Practice Toolkit)
+--------------------------------------------------------------------- */
+.tab-row{ display:flex; gap:.5rem; flex-wrap:wrap; border-bottom:1px solid var(--ink-border-soft); margin-bottom:1.75rem; }
+.tab-btn{
+  padding:.75rem 1.1rem; font-size:var(--step--1); color:var(--bone-dim);
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+}
+.tab-btn[aria-selected="true"]{ color:var(--amber-strong); border-color:var(--amber); }
+.tab-panel{ display:none; }
+.tab-panel.active{ display:block; }
+.toolkit-list{ display:flex; flex-direction:column; gap:1.5rem; }
+.toolkit-item{ display:grid; grid-template-columns:auto 1fr; gap:1rem; }
+.toolkit-item .ti-mark{ width:6px; border-radius:3px; background:var(--ink-border); }
+.toolkit-item.tier-strong .ti-mark{ background:var(--teal); }
+.toolkit-item.tier-emerging .ti-mark{ background:var(--amber); }
+.toolkit-item h4{ margin-bottom:.35rem; }
+.tier-tag{ font-size:.7rem; color:var(--dim); text-transform:none; letter-spacing:.02em; margin-left:.6rem; }
+
+/* ---------------------------------------------------------------------
+   6e. EVIDENCE LIBRARY
+--------------------------------------------------------------------- */
+.evidence-entry{ padding-block:1.25rem; border-bottom:1px solid var(--ink-border-soft); }
+.evidence-entry:first-child{ padding-top:0; }
+.evidence-entry .ev-who{ color:var(--bone); font-weight:600; }
+.evidence-entry .ev-what{ color:var(--bone-dim); margin-top:.3rem; }
+.evidence-entry .ev-tag{
+  display:inline-block; margin-top:.5rem; font-size:.72rem; color:var(--teal-strong);
+  border:1px solid var(--teal-dim); border-radius:999px; padding:.15rem .6rem;
+}
+
+/* ---------------------------------------------------------------------
+   6f. FOOTER
+--------------------------------------------------------------------- */
+footer{ border-top:1px solid var(--ink-border-soft); padding-block:3.5rem 2.5rem; background:var(--ink-900); }
+footer .foot-grid{ display:grid; gap:2.5rem; }
+@media(min-width:820px){ footer .foot-grid{ grid-template-columns:1.3fr 1fr 1fr; } }
+footer h4{ color:var(--bone); margin-bottom:.85rem; }
+footer p, footer li{ color:var(--bone-faint); font-size:var(--step--1); }
+footer .zero-harm{
+  border:1px solid var(--rose-dim); border-radius:var(--radius-m);
+  padding:1.1rem 1.25rem; background:rgba(201,112,100,.06);
+}
+footer .zero-harm h4{ color:var(--rose); }
+footer .zero-harm p{ color:var(--bone-dim); }
+footer ul{ display:flex; flex-direction:column; gap:.5rem; }
+footer .fine{ margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--ink-border-soft); color:var(--dim); font-size:.78rem; }
+footer .fine a{ color:var(--bone-faint); }
+
+/* ---------------------------------------------------------------------
+   7. PRINT STYLESHEET
+   A genuinely separate design for paper: light background, dark text,
+   no decoration, expanded detail elements, visible link targets.
+--------------------------------------------------------------------- */
+@media print{
+  #splash,#topnav,#toc-panel,#toc-scrim,#hud-fab,#hud-panel,#search-overlay,
+  .skip,#progressbar,.cta-row,#constellation-canvas,#constellation-legend{ display:none !important; }
+  html,body{ background:#fff; color:#111; }
+  .section{ padding-block:1.5rem; page-break-inside:avoid; }
+  h1,h2,h3,h4{ color:#111; }
+  .prose p,.prose li,p,li{ color:#222 !important; max-width:none; }
+  .card,#constellation-wrap,.card,.evidence-entry{ background:#fff; border-color:#ccc; }
+  details.deep-dive{ background:#fff; border-color:#ccc; }
+  details.deep-dive summary::before{ display:none; }
+  .print-only-list{ display:block !important; }
+  a{ text-decoration:underline; }
+  footer{ background:#fff; }
+  footer .zero-harm{ background:#fff; border-color:#999; }
+  footer h4,footer p,footer li{ color:#222 !important; }
+  .badge{ display:none; }
+}
+
+/* ---------------------------------------------------------------------
+   8. MOTION, NOSCRIPT & MISC ACCESSIBILITY
+--------------------------------------------------------------------- */
+@media(prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  .parallax-el{ transform:none !important; }
+}
+
+noscript{ display:block; }
+.noscript-banner{
+  background:var(--ink-900); border-bottom:1px solid var(--rose-dim);
+  padding:1rem clamp(1.25rem,4vw,3rem); font-size:var(--step--1); color:var(--bone-dim);
+}
+.noscript-banner a{ color:var(--teal-strong); }
+.noscript-banner ol{ margin-top:.75rem; padding-left:1.2rem; columns:2; column-gap:2rem; }
+@media(max-width:600px){ .noscript-banner ol{ columns:1; } }
+.noscript-banner li{ margin-bottom:.25rem; }
+
+.visually-hidden{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* Skip link */
+.skip-link{
+  position:fixed; top:-3rem; left:1rem; z-index:999;
+  background:var(--amber); color:var(--ink-950); padding:.6rem 1rem;
+  border-radius:var(--radius-s); transition:top .2s ease;
+}
+.skip-link:focus{ top:1rem; }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<noscript>
+  <div class="noscript-banner">
+    <strong>Resonance runs in a reduced mode without JavaScript.</strong>
+    All research content below is fully readable, and every collapsible
+    "closer look" opens with a plain click. The search overlay, progress
+    HUD, constellation visualizer, and reflection tool need JavaScript
+    and are hidden until you enable it. Jump straight to a section:
+    <ol>
+      <li><a href="#neuroscience">The Neuroscience of Resonance</a></li>
+      <li><a href="#lifespan">Attachment Across the Lifespan</a></li>
+      <li><a href="#coregulation">Co‑Regulation</a></li>
+      <li><a href="#constellation">The Constellation of Bonds</a></li>
+      <li><a href="#fragmentation">When Resonance Breaks</a></li>
+      <li><a href="#media-lens">Engineered Resonance</a></li>
+      <li><a href="#toolkit">Policy &amp; Practice Toolkit</a></li>
+      <li><a href="#reflect">Explore Your Constellation</a></li>
+      <li><a href="#evidence">Evidence Library</a></li>
+    </ol>
+  </div>
+</noscript>
+
+<!-- ================================================================
+     SPLASH SCREEN
+     Pure-CSS lifecycle animation (see @keyframes splashLifecycle).
+     script.js adds a click-to-skip handler and short-circuits this
+     entirely for returning visitors (flag read from IndexedDB).
+================================================================= -->
+<div id="splash" aria-hidden="true">
+  <div class="wave-stage">
+    <svg viewBox="0 0 420 120" preserveAspectRatio="none">
+      <path class="wave-a" id="splashWaveA" d="M0,60 Q52,10 105,60 T210,60 T315,60 T420,60"/>
+      <path class="wave-b" id="splashWaveB" d="M0,60 Q52,110 105,60 T210,60 T315,60 T420,60"/>
+    </svg>
+  </div>
+  <div class="brand">Resonance</div>
+  <p class="tag">A field atlas of human bonding, tuning into phase.</p>
+  <button class="skip" id="splashSkip" type="button">Enter atlas</button>
+</div>
+
+<!-- ================================================================
+     STICKY NAV — brand, TOC toggle, search, compact HUD, scroll progress
+================================================================= -->
+<header id="topnav">
+  <div class="wrap">
+    <a class="brandmark" href="#hero" aria-label="Resonance, home">
+      <span class="dot" aria-hidden="true"></span><span class="full">Resonance</span>
+    </a>
+    <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="toc-panel">
+      <span aria-hidden="true">☰</span> Contents
+    </button>
+    <button class="search-toggle" id="searchToggle" aria-haspopup="dialog" aria-controls="search-overlay">
+      <span aria-hidden="true">⌕</span> Search
+    </button>
+    <div class="nav-spacer"></div>
+    <button class="nav-hud-compact" id="hudCompactBtn" aria-haspopup="dialog" aria-controls="hud-panel">
+      <span class="lvl" id="navLevelLabel">Lv.1 Observer</span>
+      <span class="xp-track" aria-hidden="true"><span id="navXpFill"></span></span>
+    </button>
+  </div>
+  <div id="progressbar" aria-hidden="true"><span id="progressFill"></span></div>
+</header>
+
+<!-- ================================================================
+     TOC SLIDE-OVER
+================================================================= -->
+<div id="toc-scrim"></div>
+<nav id="toc-panel" aria-label="Table of contents">
+  <h4>Contents</h4>
+  <ol id="tocList">
+    <li><a href="#hero" data-target="hero">Resonance</a></li>
+    <li><a href="#neuroscience" data-target="neuroscience">The Neuroscience of Resonance</a></li>
+    <li><a href="#lifespan" data-target="lifespan">Attachment Across the Lifespan</a></li>
+    <li><a href="#coregulation" data-target="coregulation">Co‑Regulation &amp; the Social Baseline</a></li>
+    <li><a href="#constellation" data-target="constellation">The Constellation of Bonds</a></li>
+    <li><a href="#fragmentation" data-target="fragmentation">When Resonance Breaks</a></li>
+    <li><a href="#media-lens" data-target="media-lens">Engineered Resonance</a></li>
+    <li><a href="#toolkit" data-target="toolkit">Policy &amp; Practice Toolkit</a></li>
+    <li><a href="#reflect" data-target="reflect">Explore Your Constellation</a></li>
+    <li><a href="#evidence" data-target="evidence">Evidence Library</a></li>
+  </ol>
+  <hr class="rule" style="margin-block:1.5rem">
+  <h4>Session</h4>
+  <p style="color:var(--bone-faint);font-size:var(--step--1);line-height:1.5">
+    Your progress, choices, and settings are stored only on this device
+    (IndexedDB), never sent anywhere.
+  </p>
+  <label style="display:flex;align-items:flex-start;gap:.5rem;margin-top:.85rem;font-size:var(--step--1);color:var(--bone-dim);cursor:pointer;">
+    <input type="checkbox" id="analyticsOptIn" style="margin-top:.2rem;">
+    <span>Keep a private on-device visit counter (optional, off by default, never leaves this browser)</span>
+  </label>
+  <p id="analytics-summary" style="color:var(--dim);font-size:.75rem;margin-top:.5rem;"></p>
+  <button id="resetProgressBtn" class="btn btn-ghost" style="padding:.35rem .8rem;margin-top:.85rem;font-size:.75rem">Reset my progress</button>
+</nav>
+
+<!-- ================================================================
+     SEARCH OVERLAY
+================================================================= -->
+<div id="search-overlay" role="dialog" aria-modal="true" aria-label="Search Resonance">
+  <div id="search-box">
+    <input id="search-input" type="text" placeholder="Search the atlas — try “oxytocin” or “loneliness”" autocomplete="off" maxlength="80">
+    <div id="search-results"></div>
+    <p id="search-hint">Press <kbd>Esc</kbd> to close · results jump to the passage in place</p>
+  </div>
+</div>
+
+<!-- ================================================================
+     GAMIFICATION HUD — floating action button + expandable panel
+================================================================= -->
+<button id="hud-fab" aria-haspopup="dialog" aria-controls="hud-panel" aria-label="Open progress panel">✦</button>
+<div id="hud-panel" role="dialog" aria-label="Your progress">
+  <div class="hud-top">
+    <span class="hud-title" id="hudLevelTitle">Lv.1 · Observer</span>
+    <button class="hud-close" id="hudCloseBtn" aria-label="Close">×</button>
+  </div>
+  <div class="xp-row">
+    <span id="hudXpLabel">0 / 50 XP</span>
+    <span class="xp-track"><span id="hudXpFill"></span></span>
+  </div>
+  <div id="badge-grid" aria-label="Badges earned"></div>
+</div>
+
+<main id="main">
+
+<!-- ================================================================
+     HERO
+     The characteristic moment of the whole subject: two waveforms,
+     initially out of phase, sliding into synchrony. This is the one
+     orchestrated motion moment for the page — everything else is
+     quieter and answers user action rather than playing on its own.
+================================================================= -->
+<section id="hero">
+  <div id="hero-wave" class="parallax-el" data-parallax="0.15" aria-hidden="true">
+    <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+      <path id="heroWaveA" d="" stroke="var(--teal)" stroke-width="1.4" fill="none" opacity="0.5"/>
+      <path id="heroWaveB" d="" stroke="var(--amber)" stroke-width="1.4" fill="none" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="wrap">
+    <h1>Two nervous systems, tuning toward each other.</h1>
+    <p class="lede">Resonance is a field atlas of how humans bond — the neuroscience
+      of attachment, the biology of co‑regulation, and what happens, at a civic scale,
+      when that capacity is nourished or starved. Built for the people who design
+      classrooms, cities, and public policy, and for the students who will inherit them.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#neuroscience">Start with the science</a>
+      <a class="btn btn-ghost" href="#toolkit">Jump to the toolkit</a>
+    </div>
+    <dl class="hero-meta">
+      <div><dt>Built for</dt><dd>Policymakers, educators, students, and civic technologists</dd></div>
+      <div><dt>Grounded in</dt><dd>Attachment theory, affective neuroscience, and public‑health research</dd></div>
+      <div><dt>Runs</dt><dd>Entirely on this device — no accounts, no network calls, no tracking</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 1 — THE NEUROSCIENCE OF RESONANCE
+================================================================= -->
+<section id="neuroscience" class="section" data-hud-section="neuroscience" data-xp-title="Neuroscience Explorer">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Foundations</span></div>
+      <h2>The neuroscience of resonance</h2>
+    </div>
+    <div class="prose col">
+      <p>Long before infants have language, they have attunement. A caregiver's
+        nervous system and an infant's nervous system fall into a kind of duet —
+        shared rhythms of gaze, tone, and touch that regulate the infant's heart
+        rate, cortisol, and eventual capacity to feel safe. Psychiatrists Thomas
+        Lewis, Fari Amini, and Richard Lannon gave this phenomenon a name in their
+        1990s synthesis of attachment neuroscience: <strong>limbic resonance</strong>
+        — the idea that mammalian brains are built to sense and shift toward the
+        internal states of the mammals around them, and that this capacity, not
+        willpower or reasoning, is the biological root of empathy and bonding.</p>
+      <p>"Resonance" is not a metaphor here so much as a working description. Two
+        oscillating systems — two nervous systems, two heart‑rate rhythms, two
+        patterns of brainwave activity — begin the interaction out of phase, and
+        under the right conditions of safety and attention, drift into alignment.
+        The rest of this atlas is, in a sense, a map of the conditions that make
+        that alignment more or less likely.</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:3rem;">
+      <div class="card">
+        <h4>Oxytocin and vasopressin</h4>
+        <p class="prose" style="margin-top:.6rem;">These two related neuropeptides are
+          released during touch, breastfeeding, orgasm, and moments of trust, and
+          they act on ancient reward circuitry. Comparative work on prairie voles
+          (socially monogamous) versus their close relatives the montane vole
+          (largely solitary) — led by researchers including Sue Carter and Larry
+          Young — traced the difference to receptor density for these two hormones
+          in the brain's reward regions, not to the hormones themselves. The
+          popular 2000s framing of oxytocin as a simple "trust hormone" you could
+          dose your way to closeness with has not held up well under replication;
+          what survives is narrower and more interesting — context‑dependent
+          modulation of social salience, not a love potion.</p>
+      </div>
+      <div class="card">
+        <h4>Interpersonal neural synchrony</h4>
+        <p class="prose" style="margin-top:.6rem;">"Hyperscanning" studies — recording
+          two or more brains at once with EEG or fMRI — find that listeners'
+          brain activity comes to mirror a speaker's with a short delay, an
+          effect neuroscientist Uri Hasson's lab termed <em>neural coupling</em>,
+          and that the strength of that coupling predicts how well the story was
+          understood. Related hyperscanning work finds measurable synchrony
+          between romantic partners, between therapists and clients, and between
+          teachers and engaged students — an emerging, still‑maturing evidence
+          base for what teachers have long called "being in the room together."</p>
+      </div>
+    </div>
+
+    <details class="deep-dive col">
+      <summary>A closer look: how hyperscanning actually works</summary>
+      <div class="dd-body prose">
+        <p>Instead of scanning one brain at a time, researchers put two people in
+          adjoining scanners (fMRI) or wire them with parallel EEG caps, and
+          record continuously while they interact — talking, playing a
+          cooperative game, or simply sitting together. Analysts then look for
+          correlated activity <em>across</em> the two brains, time‑lagged to
+          account for the gap between speaking and hearing. A tight, consistent
+          lag‑correlation is read as synchrony. The method is younger and noisier
+          than single‑brain imaging, and effect sizes vary a great deal across
+          labs and tasks — a caution worth holding onto before treating any
+          single hyperscanning finding as settled fact.</p>
+      </div>
+    </details>
+
+    <details class="deep-dive col">
+      <summary>Where the science is contested: mirror neurons</summary>
+      <div class="dd-body prose">
+        <p>Giacomo Rizzolatti's team identified neurons in macaque premotor
+          cortex that fire both when the animal performs an action and when it
+          watches another perform the same action — a striking finding, quickly
+          popularized as the neural basis of empathy and imitation in humans.
+          Direct single‑neuron evidence in humans is far sparser than the
+          popular narrative implies, and a number of cognitive neuroscientists
+          have pushed back hard on "mirror neurons explain empathy" as an
+          overreach. The safest current summary: mirroring‑like processes likely
+          contribute to how humans model other minds, but they are one
+          contributor among several, not a master explanation.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 2 — ATTACHMENT ACROSS THE LIFESPAN
+     This content genuinely is a sequence (a life unfolding in time),
+     so — unlike most of the atlas — numbered stages are appropriate.
+================================================================= -->
+<section id="lifespan" class="section" data-hud-section="lifespan" data-xp-title="Lifespan Cartographer">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Development</span></div>
+      <h2>Attachment across the lifespan</h2>
+      <p class="prose" style="margin-top:1rem;">John Bowlby proposed in the 1950s
+        that infants are born with an instinct to seek proximity to a caregiver
+        under threat, and that the quality of that early bond becomes a template —
+        not a life sentence — for how a person approaches closeness afterward. His
+        collaborator Mary Ainsworth gave the theory an experiment: the
+        <em>Strange Situation</em>, a brief, structured separation‑and‑reunion in
+        a lab playroom, from which she classified infants as secure, anxious, or
+        avoidant in their bond with a caregiver — later work added a fourth,
+        disorganized, pattern.</p>
+    </div>
+
+    <ol style="display:flex;flex-direction:column;gap:2.25rem;list-style:none;padding:0;">
+      <li class="grid-2" style="align-items:start;">
+        <div><span class="section-kicker"><span class="num">01</span><span class="line" aria-hidden="true"></span></span>
+          <h3>Infancy</h3></div>
+        <div class="prose"><p>The Strange Situation's four patterns are not
+          diagnoses; they are descriptions of a strategy a child has learned for
+          managing a caregiver's availability. A secure infant protests
+          separation and is readily soothed at reunion. An avoidant infant
+          minimizes visible distress, having learned that big displays of need
+          go unanswered. An anxious infant struggles to settle even once the
+          caregiver returns. A disorganized infant shows contradictory,
+          sometimes frozen responses, often linked to a caregiver who is
+          themselves a source of both comfort and fear.</p></div>
+      </li>
+      <li class="grid-2" style="align-items:start;">
+        <div><span class="section-kicker"><span class="num">02</span><span class="line" aria-hidden="true"></span></span>
+          <h3>Adolescence</h3></div>
+        <div class="prose"><p>Attachment behavior doesn't disappear at
+          adolescence; its target shifts. Peers and early romantic partners
+          become primary attachment figures alongside parents, and the
+          negotiation of autonomy — wanting closeness and separateness at once —
+          becomes the developmental task. Schools function, whether they intend
+          to or not, as a second attachment environment: a consistent, attuned
+          teacher measurably changes a struggling adolescent's trajectory.</p></div>
+      </li>
+      <li class="grid-2" style="align-items:start;">
+        <div><span class="section-kicker"><span class="num">03</span><span class="line" aria-hidden="true"></span></span>
+          <h3>Adulthood</h3></div>
+        <div class="prose"><p>Cindy Hazan and Phillip Shaver's 1987 extension of
+          attachment theory to romantic love found the same four‑pattern
+          structure in adult relationships that Ainsworth had found in infant
+          ones. Crucially, adult attachment style is not fixed at whatever
+          pattern was set in infancy: clinicians describe <em>earned secure
+          attachment</em> — a documented capacity for adults with a difficult
+          early template to build a coherent, secure way of relating later,
+          often through a stable relationship or therapeutic one.</p></div>
+      </li>
+      <li class="grid-2" style="align-items:start;">
+        <div><span class="section-kicker"><span class="num">04</span><span class="line" aria-hidden="true"></span></span>
+          <h3>Late life</h3></div>
+        <div class="prose"><p>Bonds anchor aging bodies to the world; losing them
+          is measurably dangerous. Bereavement is, physiologically, a bond
+          rupture — the sudden absence of a nervous system that yours had
+          learned to regulate against. Widowhood is one of the more consistent
+          predictors of near‑term mortality risk in the epidemiological
+          literature, and social isolation in older adults compounds cognitive
+          decline independent of any single diagnosis.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 3 — CO-REGULATION & THE SOCIAL BASELINE
+================================================================= -->
+<section id="coregulation" class="section" data-hud-section="coregulation" data-xp-title="Co-Regulation Scholar">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Mechanism</span></div>
+      <h2>Co‑regulation and the social baseline</h2>
+    </div>
+    <div class="prose col">
+      <p>In a now well‑known experiment, University of Virginia psychologist
+        James Coan placed participants in an fMRI scanner and threatened them
+        with a mild electric shock — sometimes alone, sometimes holding a
+        stranger's hand, sometimes holding a spouse's. Threat‑related activity
+        in the brain dropped the most when a spouse held their hand, and dropped
+        further still the higher the couple rated their relationship quality.
+        The nervous system, in other words, was outsourcing part of the work of
+        feeling safe to another nervous system in physical contact with it.</p>
+      <p>Coan's broader account, <strong>social baseline theory</strong>, argues
+        that the human brain's default assumption is proximity to trusted
+        others, and that navigating the world without that proximity carries a
+        real, measurable metabolic cost — vigilance the brain doesn't have to
+        spend when it can safely assume help is nearby. Bonding, on this view,
+        is not a pleasant extra; it is a load‑bearing part of how the nervous
+        system budgets its own effort.</p>
+    </div>
+
+    <div class="grid-3" style="margin-top:2.5rem;">
+      <div class="card">
+        <h4>In parenting</h4>
+        <p class="prose" style="margin-top:.5rem;">Popularized by clinicians
+          like Daniel Siegel and Tina Payne Bryson, co‑regulation names the
+          everyday work of a calm adult nervous system helping an escalated
+          child's nervous system come back down — the biological substrate
+          underneath what parenting guidance calls "connect before you
+          redirect."</p>
+      </div>
+      <div class="card">
+        <h4>In therapy</h4>
+        <p class="prose" style="margin-top:.5rem;">Across modalities, the
+          single most reliable predictor of therapeutic outcome is not the
+          technique used but the quality of the therapeutic alliance — itself a
+          co‑regulation relationship, and a strong argument for funding models
+          that let a client stay with one clinician long enough for a real bond
+          to form.</p>
+      </div>
+      <div class="card">
+        <h4>In the classroom</h4>
+        <p class="prose" style="margin-top:.5rem;">Stephen Porges's
+          <em>polyvagal theory</em> — an influential, still debated framework
+          about a "social engagement" branch of the vagus nerve — has been
+          widely adapted into trauma‑informed teaching practice. Physiologists
+          dispute some of its specific mechanistic claims; the practical
+          takeaway that a dysregulated nervous system can't learn until it
+          feels safe has held up well independent of the underlying model.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 4 — THE CONSTELLATION OF BONDS (interactive)
+     A canvas node-graph connecting nine bond types to the five
+     underlying mechanisms covered above. Nodes are also exposed as
+     ordinary buttons (the legend below the canvas) so the same
+     interaction works without a mouse or a screen that renders canvas.
+================================================================= -->
+<section id="constellation" class="section" data-hud-section="constellation" data-xp-title="Constellation Mapper">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Interactive</span></div>
+      <h2>The constellation of bonds</h2>
+      <p class="prose" style="margin-top:1rem;">Every kind of human bond draws on
+        the same small set of mechanisms above, in different proportions. Select
+        a bond type to see which mechanisms light up underneath it, or select a
+        mechanism to see every bond it touches. Your explorations are saved
+        locally as you go.</p>
+    </div>
+    <div id="constellation-wrap">
+      <canvas id="constellation-canvas" role="img" aria-label="Interactive node graph of bond types and their underlying mechanisms. Use the buttons below the canvas to explore it without a mouse."></canvas>
+      <div id="constellation-legend" role="list" aria-label="Bond types and mechanisms"></div>
+      <div id="constellation-info">
+        <p class="ci-placeholder">Select a node above — a bond type or a
+          mechanism — to see how it connects.</p>
+      </div>
+    </div>
+    <div class="print-only-list prose">
+      <h4>Printed reference: the bond–mechanism map</h4>
+      <p>The interactive constellation above is omitted from print. In full, it
+        connects nine bond types — parent–infant, romantic pair‑bond, sibling,
+        friendship, therapeutic alliance, teacher–student, community/collective,
+        human–animal, and grief (a ruptured bond) — to five underlying
+        mechanisms: oxytocin &amp; vasopressin signaling, interpersonal neural
+        synchrony, co‑regulation, mirroring, and shared attention. Most bond
+        types draw on three or more mechanisms at once; grief is modeled as the
+        same mechanisms in reverse, registering as an alarm rather than a
+        comfort once the other nervous system is gone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 5 — WHEN RESONANCE BREAKS: LONELINESS & FRAGMENTATION
+================================================================= -->
+<section id="fragmentation" class="section" data-hud-section="fragmentation" data-xp-title="Civic Realist">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Civic stakes</span></div>
+      <h2>When resonance breaks</h2>
+    </div>
+    <div class="prose col">
+      <p>A 2010 meta‑analysis by Julianne Holt‑Lunstad and colleagues, pooling
+        data from more than 300,000 people, found that weak social ties predict
+        earlier death about as strongly as many well‑known clinical risk
+        factors — a comparison that later entered public‑health communication
+        as "loneliness is as dangerous as smoking." The U.S. Surgeon General,
+        Dr. Vivek Murthy, formalized that concern on May 2, 2023, in an
+        advisory titled <em>Our Epidemic of Loneliness and Isolation</em>,
+        calling for investment in social connection on par with other major
+        public‑health priorities.</p>
+      <p>Governments have begun treating this as an infrastructure problem
+        rather than a private misfortune. The United Kingdom appointed the
+        world's first Minister for Loneliness, Tracey Crouch, in January 2018,
+        following a cross‑party commission's finding that millions of Britons
+        reported frequent loneliness. Japan followed in February 2021, naming
+        Tetsushi Sakamoto Minister of Loneliness and Isolation after a rare
+        year‑on‑year rise in the national suicide rate during the pandemic. The
+        two ministries have since coordinated directly with one another.</p>
+      <p>Urban sociologist Ray Oldenburg's concept of the <strong>third
+        place</strong> — a low‑cost, low‑commitment gathering spot that is
+        neither home nor work, like a library, a corner café, or a community
+        pool — reframes bonding as something a city plans for or fails to plan
+        for. A neighborhood with no third places is not merely inconvenient; on
+        this evidence base, it is a neighborhood quietly producing worse health
+        outcomes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 6 — ENGINEERED RESONANCE (critical media lens)
+     A critique of products that simulate or exploit bonding
+     psychology for engagement rather than genuine connection —
+     descriptive analysis, not a design playbook.
+================================================================= -->
+<section id="media-lens" class="section" data-hud-section="media-lens" data-xp-title="Media Critic">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Critical lens</span></div>
+      <h2>Engineered resonance</h2>
+      <p class="prose" style="margin-top:1rem;">Everything in this atlas so far
+        describes a nervous system doing what it evolved to do. It is worth
+        asking, soberly, what happens when a product is built to trigger those
+        same circuits on purpose, at scale, in the service of a metric that has
+        nothing to do with the user's wellbeing.</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:2.5rem;">
+      <div class="card">
+        <h4>Parasocial relationships</h4>
+        <p class="prose" style="margin-top:.5rem;">Sociologists Donald Horton and
+          Richard Wohl coined <em>parasocial interaction</em> in 1956 to describe
+          the one‑sided intimacy TV viewers felt toward broadcasters. Recommender
+          algorithms and the creator economy have since industrialized the
+          effect: a feed optimized purely for watch time will learn, with no
+          human intent required, to surface whichever creators trigger the
+          strongest one‑sided bonding response.</p>
+      </div>
+      <div class="card">
+        <h4>Variable‑ratio design</h4>
+        <p class="prose" style="margin-top:.5rem;">B.F. Skinner found that
+          rewards delivered on an unpredictable schedule produce more
+          compulsive checking behavior than rewards delivered reliably. Swipe‑
+          based dating apps and social feeds are frequently built on exactly
+          this schedule — critics associated with the Center for Humane
+          Technology have argued that "engagement" metrics in these products
+          often reward the same unpredictability that keeps a slot‑machine
+          player pulling the lever, independent of whether a genuine bond ever
+          forms.</p>
+      </div>
+    </div>
+
+    <div class="prose col" style="margin-top:2rem;">
+      <p>The newest version of this question concerns AI companion products
+        explicitly designed around ongoing, emotionally responsive
+        conversation. These products can offer real comfort — a message
+        answered at 3 a.m. is not nothing — but a design optimized for daily
+        return visits and a growing sense of intimacy runs the same risk as any
+        engagement‑optimized product: the incentive is to deepen the bond, not
+        to serve the person's actual wellbeing, and the two can quietly come
+        apart. A tool built honestly on the science in this atlas should say so
+        plainly, which is part of why this platform's own footer includes an
+        explicit boundary against being used to manufacture bonding rather than
+        to explain it.</p>
+    </div>
+
+    <details class="deep-dive col">
+      <summary>A closer look: telling genuine resonance from engineered resonance</summary>
+      <div class="dd-body prose">
+        <p>None of the mechanisms in this atlas are inherently suspect — touch,
+          synchrony, and attention are how real bonds are built. A rough,
+          non‑diagnostic heuristic for telling the two apart: genuine bonding
+          tolerates absence and disagreement without collapsing, and typically
+          strengthens a person's other relationships alongside it. Engineered
+          resonance is usually built to punish absence (streaks, guilt‑framed
+          notifications), to discourage disagreement (frictionless agreement,
+          rare pushback), and to compete with — rather than complement — a
+          person's bonds with other humans.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 7 — POLICY & PRACTICE TOOLKIT
+     Three audience tabs: Policymakers / Educators / Students.
+================================================================= -->
+<section id="toolkit" class="section" data-hud-section="toolkit" data-xp-title="Practitioner">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Applied</span></div>
+      <h2>Policy &amp; practice toolkit</h2>
+      <p class="prose" style="margin-top:1rem;">The same evidence supports
+        different action depending on where you sit. Pick a track.</p>
+    </div>
+
+    <div role="tablist" class="tab-row" aria-label="Toolkit audience">
+      <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tab-policy" id="tabbtn-policy" data-tab="tab-policy">Policymakers</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-teach" id="tabbtn-teach" data-tab="tab-teach">Educators</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-student" id="tabbtn-student" data-tab="tab-student">Students</button>
+    </div>
+
+    <div id="tab-policy" class="tab-panel active" role="tabpanel" aria-labelledby="tabbtn-policy">
+      <div class="toolkit-list">
+        <div class="toolkit-item tier-strong">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Social prescribing<span class="tier-tag">established pilots</span></h4>
+            <p class="prose">The UK's NHS social‑prescribing model lets clinicians
+              refer isolated patients to community activities — a walking group,
+              a choir, a repair café — as a formal part of care, treating a
+              bonding deficit as a legitimate clinical target rather than a
+              lifestyle footnote.</p></div>
+        </div>
+        <div class="toolkit-item tier-strong">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Parental leave design<span class="tier-tag">strong evidence base</span></h4>
+            <p class="prose">The length and flexibility of paid leave in an
+              infant's first months shapes how much uninterrupted co‑regulation
+              time a caregiver can offer during the exact window attachment
+              research identifies as most sensitive.</p></div>
+        </div>
+        <div class="toolkit-item tier-emerging">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Funding "third places"<span class="tier-tag">emerging practice</span></h4>
+            <p class="prose">Libraries, community centers, and public seating are
+              bonding infrastructure in the same sense that transit is mobility
+              infrastructure — a frame that can shift capital budgets when
+              stated explicitly in a proposal.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-teach" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-teach" hidden>
+      <div class="toolkit-list">
+        <div class="toolkit-item tier-strong">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Banking time<span class="tier-tag">studied intervention</span></h4>
+            <p class="prose">Developmental psychologist Robert Pianta's
+              "banking time" protocol has a teacher spend a few minutes of
+              regular, child‑led, judgment‑free attention with a struggling
+              student — building a relational reserve to draw on during harder
+              moments — with measured gains in classroom behavior.</p></div>
+        </div>
+        <div class="toolkit-item tier-strong">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Restorative practices<span class="tier-tag">widely adopted</span></h4>
+            <p class="prose">Conflict‑repair circles that keep a harmed
+              relationship intact, instead of routing straight to exclusionary
+              discipline, treat the teacher–student and peer bonds themselves as
+              the thing worth protecting.</p></div>
+        </div>
+        <div class="toolkit-item tier-emerging">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Polyvagal‑informed classrooms<span class="tier-tag">emerging practice</span></h4>
+            <p class="prose">Regulation‑first strategies — a calm entry routine,
+              predictable transitions — aim at the nervous system before the
+              behavior, on the premise from Section 3 that dysregulated students
+              can't yet access the co‑regulation a lesson requires.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-student" class="tab-panel" role="tabpanel" aria-labelledby="tabbtn-student" hidden>
+      <div class="toolkit-list">
+        <div class="toolkit-item tier-strong">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Map your own bonds<span class="tier-tag">self-directed</span></h4>
+            <p class="prose">Use the reflection tool further down this atlas, then
+              journal on one relationship where you noticed real co‑regulation —
+              a moment someone else's calm helped regulate yours, or the reverse.</p></div>
+        </div>
+        <div class="toolkit-item tier-strong">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Practice shared attention<span class="tier-tag">self-directed</span></h4>
+            <p class="prose">In a small group, try two minutes of looking at the
+              same object and describing it aloud in turn, no other agenda — a
+              deliberately simple exercise in the "shared attention" mechanism
+              from the constellation above.</p></div>
+        </div>
+        <div class="toolkit-item tier-emerging">
+          <div class="ti-mark" aria-hidden="true"></div>
+          <div><h4>Audit your own feeds<span class="tier-tag">media literacy</span></h4>
+            <p class="prose">Apply the "genuine vs. engineered resonance"
+              heuristic from Section 6 to one app you use daily — does it
+              tolerate your absence and disagreement, or does it work to punish
+              both?</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 8 — EXPLORE YOUR CONSTELLATION (self-reflection tool)
+     Informal, non-diagnostic. All choice-based (no free text), which
+     also keeps the input-sanitization surface small by construction.
+================================================================= -->
+<section id="reflect" class="section" data-hud-section="reflect" data-xp-title="Self-Aware">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Reflection</span></div>
+      <h2>Explore your constellation</h2>
+      <p class="prose reflect-disclaimer" style="margin-top:1rem;">This is an
+        informal, educational reflection, not a clinical assessment — it
+        cannot diagnose an attachment style or a relationship, and it isn't a
+        substitute for talking with a licensed therapist if you have real
+        concerns about a relationship. Your answers are stored only on this
+        device and are never transmitted anywhere.</p>
+    </div>
+
+    <form id="reflect-form" aria-label="Bonding tendencies reflection">
+      <div class="reflect-item" data-axis="close" data-weight="1">
+        <p class="prompt">1. I find it easy to depend on people close to me.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 1"></div>
+      </div>
+      <div class="reflect-item" data-axis="close" data-weight="1">
+        <p class="prompt">2. I'm comfortable sharing my worries with someone I trust.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 2"></div>
+      </div>
+      <div class="reflect-item" data-axis="close" data-weight="1">
+        <p class="prompt">3. I don't mind when someone close to me wants a lot of togetherness.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 3"></div>
+      </div>
+      <div class="reflect-item" data-axis="close" data-weight="-1">
+        <p class="prompt">4. I'd rather handle problems on my own than lean on someone else.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 4"></div>
+      </div>
+      <div class="reflect-item" data-axis="anx" data-weight="1">
+        <p class="prompt">5. I often worry that people close to me don't care as much as I do.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 5"></div>
+      </div>
+      <div class="reflect-item" data-axis="anx" data-weight="1">
+        <p class="prompt">6. I need a fair amount of reassurance that I'm loved.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 6"></div>
+      </div>
+      <div class="reflect-item" data-axis="anx" data-weight="1">
+        <p class="prompt">7. I get anxious when someone I'm close to is unreachable for a while.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 7"></div>
+      </div>
+      <div class="reflect-item" data-axis="anx" data-weight="-1">
+        <p class="prompt">8. I rarely worry about being abandoned by people close to me.</p>
+        <div class="likert" role="radiogroup" aria-label="Question 8"></div>
+      </div>
+
+      <div class="cta-row">
+        <button type="submit" class="btn btn-primary">See where I land</button>
+        <button type="button" id="reflectResetBtn" class="btn btn-ghost">Clear answers</button>
+      </div>
+    </form>
+
+    <div id="reflect-result">
+      <svg id="quadrant-svg" viewBox="0 0 220 220" role="img" aria-labelledby="quadrantDesc">
+        <desc id="quadrantDesc">A quadrant chart plotting comfort with closeness against worry about a partner's availability, with a dot marking where your answers land.</desc>
+        <line class="axis" x1="110" y1="10" x2="110" y2="210"/>
+        <line class="axis" x1="10" y1="110" x2="210" y2="110"/>
+        <text class="qlabel" x="14" y="30">fearful</text>
+        <text class="qlabel" x="150" y="30">anxious</text>
+        <text class="qlabel" x="14" y="204">avoidant</text>
+        <text class="qlabel" x="150" y="204">secure</text>
+        <circle id="quadrantDot" class="dot" cx="110" cy="110" r="6"/>
+      </svg>
+      <div class="reflect-readout">
+        <h4 id="reflectLeaning">—</h4>
+        <p class="prose" id="reflectCopy" style="max-width:32ch;"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SECTION 9 — EVIDENCE LIBRARY
+     Starting points for further reading, not a formal bibliography —
+     this is a static offline file, so exact citation details (volume,
+     page, DOI) should be verified against a live database before
+     being cited further.
+================================================================= -->
+<section id="evidence" class="section" data-hud-section="evidence" data-xp-title="Field Researcher">
+  <div class="wrap">
+    <div class="section-head col">
+      <div class="section-kicker"><span class="line" aria-hidden="true"></span><span>Sources</span></div>
+      <h2>Evidence library</h2>
+      <p class="prose" style="margin-top:1rem;">Foundational names and concepts
+        referenced across this atlas, as starting points for your own reading —
+        verify current citation details against a live database before citing
+        any of these further.</p>
+    </div>
+    <div class="col" id="evidence-list">
+      <div class="evidence-entry"><span class="ev-who">Bowlby &amp; Ainsworth</span>
+        <p class="ev-what">Founders of attachment theory; the Strange Situation
+          protocol and the original secure / anxious / avoidant typology.</p>
+        <span class="ev-tag">Developmental psychology</span></div>
+      <div class="evidence-entry"><span class="ev-who">Lewis, Amini &amp; Lannon</span>
+        <p class="ev-what"><em>A General Theory of Love</em> (2000) — the source
+          of "limbic resonance" as a working account of mammalian bonding.</p>
+        <span class="ev-tag">Affective neuroscience</span></div>
+      <div class="evidence-entry"><span class="ev-who">Carter &amp; Young</span>
+        <p class="ev-what">Comparative vole research linking oxytocin/vasopressin
+          receptor distribution to pair‑bonding behavior.</p>
+        <span class="ev-tag">Neuroendocrinology</span></div>
+      <div class="evidence-entry"><span class="ev-who">Uri Hasson</span>
+        <p class="ev-what">Hyperscanning work on "neural coupling" between
+          speakers and listeners.</p>
+        <span class="ev-tag">Cognitive neuroscience</span></div>
+      <div class="evidence-entry"><span class="ev-who">James Coan</span>
+        <p class="ev-what">The hand‑holding fMRI studies underlying social
+          baseline theory.</p>
+        <span class="ev-tag">Social neuroscience</span></div>
+      <div class="evidence-entry"><span class="ev-who">Stephen Porges</span>
+        <p class="ev-what">Polyvagal theory — influential in trauma‑informed
+          practice, and genuinely debated among physiologists.</p>
+        <span class="ev-tag">Contested framework</span></div>
+      <div class="evidence-entry"><span class="ev-who">Hazan &amp; Shaver</span>
+        <p class="ev-what">1987 paper extending attachment typology from infancy
+          to adult romantic love.</p>
+        <span class="ev-tag">Social psychology</span></div>
+      <div class="evidence-entry"><span class="ev-who">Julianne Holt‑Lunstad</span>
+        <p class="ev-what">2010 meta‑analysis (300,000+ participants) on social
+          ties and mortality risk.</p>
+        <span class="ev-tag">Public health</span></div>
+      <div class="evidence-entry"><span class="ev-who">Ray Oldenburg</span>
+        <p class="ev-what">The "third place" concept from <em>The Great Good
+          Place</em> (1989).</p>
+        <span class="ev-tag">Urban sociology</span></div>
+      <div class="evidence-entry"><span class="ev-who">Robert Pianta</span>
+        <p class="ev-what">"Banking time" — a studied teacher–student
+          relationship‑building protocol.</p>
+        <span class="ev-tag">Education research</span></div>
+      <div class="evidence-entry"><span class="ev-who">Horton &amp; Wohl</span>
+        <p class="ev-what">1956 origin of "parasocial interaction" as a
+          description of one‑sided media bonds.</p>
+        <span class="ev-tag">Media sociology</span></div>
+      <div class="evidence-entry"><span class="ev-who">U.S. Office of the Surgeon General</span>
+        <p class="ev-what"><em>Our Epidemic of Loneliness and Isolation</em>
+          (May 2, 2023).</p>
+        <span class="ev-tag">Federal advisory</span></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================================================================
+     FOOTER — Zero-Harm/Anti-Inversion note + Attributions & Licensing
+================================================================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="zero-harm">
+        <h4>Zero‑Harm &amp; Anti‑Inversion</h4>
+        <p>This atlas describes the science of human bonding for education and
+          civic planning. It is not a manipulation toolkit: nothing here should
+          be used to covertly engineer attachment, trust, or dependency in
+          another person, human or otherwise, without their knowledge and
+          consent — doing so inverts the purpose of this project. It stores
+          data only on your device, makes no network requests, contains no
+          hidden telemetry, and never auto‑sends anything. If you find a way
+          this tool could be repurposed to manipulate or harm someone, please
+          treat that as a bug and route it back to whoever maintains your copy.</p>
+      </div>
+      <div>
+        <h4>Attributions &amp; licensing</h4>
+        <ul>
+          <li>Original code — vanilla HTML, CSS, and JavaScript, no build step, no runtime dependencies.</li>
+          <li>Interaction patterns (skip‑link, tab panels, details/summary disclosure) follow common open web‑platform conventions; none are copied from a specific codebase.</li>
+          <li>Referenced research is credited by author in the Evidence Library — verify current citations before further reuse.</li>
+          <li>Freely adaptable for civic and educational use; keep this attribution section intact in derivatives.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>About this build</h4>
+        <p>Runs entirely offline after first load. Preferences, progress, and
+          reflection answers persist in this browser's IndexedDB, with an
+          in‑memory fallback if IndexedDB is unavailable. No accounts, no
+          analytics beyond an optional, local, resettable session counter.</p>
+      </div>
+    </div>
+    <div class="fine">
+      <p>Resonance — a field atlas of human bonding. Built as a standalone
+        document; there is no server behind it and nothing it shows you ever
+        leaves this device. <button id="footerResetLink" class="btn btn-ghost" style="padding:.2rem .6rem;font-size:.78rem;">Reset all local data</button></p>
+    </div>
+  </div>
+</footer>
+
+<!--
+  ZERO-HARM & ANTI-INVERSION (source note)
+  This file is an educational atlas on the neuroscience and civic life
+  of human bonding. It must not be adapted into a tool for covertly
+  manufacturing trust, attachment, or compliance in another person or
+  audience. It performs no network requests, stores nothing off-device,
+  ships no hidden telemetry, and auto-sends nothing. If you extend this
+  file, keep those three properties true.
+-->
+
+<script>
+'use strict';
+/* =====================================================================
+   RESONANCE — APPLICATION SCRIPT
+   -----------------------------------------------------------------
+   Sections below, in order: utilities, storage (IndexedDB + in-memory
+   fallback), HUD/XP/badges, splash + hero motion, nav/TOC/search/HUD
+   panel wiring, the constellation visualizer, the reflection tool,
+   print handling, and finally init(), which runs everything once the
+   DOM is ready and restores whatever was saved on this device.
+   Nothing in this file makes a network request or reports anything
+   off-device. See the Zero-Harm note in the footer.
+   ===================================================================== */
+(function(){
+
+/* ---------------------------------------------------------------------
+   UTILITIES
+--------------------------------------------------------------------- */
+function escapeHTML(str){
+  return String(str).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function debounce(fn, wait){
+  let t;
+  return function(){
+    const ctx=this, args=arguments;
+    clearTimeout(t);
+    t = setTimeout(function(){ fn.apply(ctx,args); }, wait);
+  };
+}
+function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+
+// Gentle client-side rate limiter for interactive actions — not a
+// security control, just protection against accidental double-fires
+// (e.g. a double-tap on a small touch target) and clumsy self-DoS.
+const _rateLog = Object.create(null);
+function rateOk(key, minMs){
+  const now = Date.now();
+  const last = _rateLog[key] || 0;
+  if(now - last < minMs) return false;
+  _rateLog[key] = now;
+  return true;
+}
+
+const prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ---------------------------------------------------------------------
+   STORAGE — IndexedDB, with a same-session in-memory fallback so the
+   app never throws if a browser has IndexedDB disabled (e.g. some
+   private-browsing modes). Everything the app persists lives under
+   one record, so a single get/put covers the whole app's state.
+--------------------------------------------------------------------- */
+const DB_NAME = 'resonanceAtlasDB';
+const DB_VERSION = 1;
+const STORE = 'kv';
+const STATE_KEY = 'resonanceState';
+
+const DEFAULT_STATE = {
+  splashSeen:false,
+  xp:0,
+  sectionsVisited:[],
+  nodesVisited:[],
+  ddOpened:[],
+  badges:[],
+  reflectAnswers:{},
+  reflectResult:null,
+  analyticsOptIn:false,
+  analyticsCounts:{},
+  lastVisit:null
+};
+
+let memoryFallback = null;
+let dbPromise = null;
+
+function openDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise = new Promise(function(resolve){
+    if(!('indexedDB' in window)){ memoryFallback = Object.assign({},DEFAULT_STATE); resolve(null); return; }
+    try{
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e){
+        const db = e.target.result;
+        if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, {keyPath:'k'});
+      };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ memoryFallback = Object.assign({},DEFAULT_STATE); resolve(null); };
+    }catch(err){ memoryFallback = Object.assign({},DEFAULT_STATE); resolve(null); }
+  });
+  return dbPromise;
+}
+
+function loadState(){
+  return openDB().then(function(db){
+    if(!db) return memoryFallback || Object.assign({},DEFAULT_STATE);
+    return new Promise(function(resolve){
+      try{
+        const tx = db.transaction(STORE,'readonly');
+        const req = tx.objectStore(STORE).get(STATE_KEY);
+        req.onsuccess = function(){
+          const rec = req.result;
+          resolve(rec ? Object.assign({},DEFAULT_STATE,rec.v) : Object.assign({},DEFAULT_STATE));
+        };
+        req.onerror = function(){ resolve(Object.assign({},DEFAULT_STATE)); };
+      }catch(err){ resolve(Object.assign({},DEFAULT_STATE)); }
+    });
+  });
+}
+
+function saveState(state){
+  return openDB().then(function(db){
+    if(!db){ memoryFallback = state; return false; }
+    return new Promise(function(resolve){
+      try{
+        const tx = db.transaction(STORE,'readwrite');
+        tx.objectStore(STORE).put({k:STATE_KEY, v:state});
+        tx.oncomplete = function(){ resolve(true); };
+        tx.onerror = function(){ resolve(false); };
+      }catch(err){ resolve(false); }
+    });
+  });
+}
+
+function clearState(){
+  return openDB().then(function(db){
+    if(!db){ memoryFallback = Object.assign({},DEFAULT_STATE); return false; }
+    return new Promise(function(resolve){
+      try{
+        const tx = db.transaction(STORE,'readwrite');
+        tx.objectStore(STORE).delete(STATE_KEY);
+        tx.oncomplete = function(){ resolve(true); };
+        tx.onerror = function(){ resolve(false); };
+      }catch(err){ resolve(false); }
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   HUD / XP / BADGES
+   XP sources: first visit to each of the 7 plain-reading sections
+   (+10 each), opening any of the 3 "closer look" deep-dives (+5 each),
+   exploring each of the 14 constellation nodes (+8 each), and
+   completing the reflection tool once (+25). A "Completionist" badge
+   is awarded automatically once every other badge is held.
+--------------------------------------------------------------------- */
+let STATE = Object.assign({}, DEFAULT_STATE);
+
+const LEVELS = [
+  {min:0,   title:'Observer'},
+  {min:50,  title:'Listener'},
+  {min:100, title:'Attuned'},
+  {min:160, title:'Synchronizer'},
+  {min:220, title:'Resonant Scholar'}
+];
+function levelFor(xp){
+  let lvl = LEVELS[0], idx = 1;
+  for(let i=0;i<LEVELS.length;i++){ if(xp>=LEVELS[i].min){ lvl=LEVELS[i]; idx=i+1; } }
+  return {index:idx, title:lvl.title, floor:lvl.min};
+}
+function xpForNextLevel(xp){
+  const cur = levelFor(xp);
+  const next = LEVELS[cur.index];
+  return next ? next.min : null;
+}
+
+const BADGES = [
+  {id:'neuroscience', label:'Neuroscience Explorer', glyph:'N'},
+  {id:'lifespan', label:'Lifespan Cartographer', glyph:'L'},
+  {id:'coregulation', label:'Co-Regulation Scholar', glyph:'C'},
+  {id:'constellation', label:'Constellation Mapper', glyph:'\u2726'},
+  {id:'fragmentation', label:'Civic Realist', glyph:'F'},
+  {id:'media-lens', label:'Media Critic', glyph:'M'},
+  {id:'toolkit', label:'Practitioner', glyph:'P'},
+  {id:'reflect', label:'Self-Aware', glyph:'R'},
+  {id:'evidence', label:'Field Researcher', glyph:'E'},
+  {id:'completionist', label:'Completionist', glyph:'\u2605'}
+];
+
+let _saveTimer = null;
+function persist(){
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(function(){ saveState(STATE); }, 250);
+}
+
+function awardXP(amount){
+  STATE.xp += amount;
+  persist();
+  renderHud();
+}
+
+function awardBadge(id){
+  if(STATE.badges.indexOf(id) !== -1) return;
+  STATE.badges.push(id);
+  const others = BADGES.filter(function(b){ return b.id!=='completionist'; }).map(function(b){ return b.id; });
+  if(id!=='completionist' && others.every(function(o){ return STATE.badges.indexOf(o)!==-1; })){
+    STATE.badges.push('completionist');
+  }
+  persist();
+  renderHud();
+}
+
+function markSectionVisited(id){
+  if(STATE.analyticsOptIn){
+    STATE.analyticsCounts[id] = (STATE.analyticsCounts[id]||0) + 1;
+    renderAnalyticsSummary();
+  }
+  if(STATE.sectionsVisited.indexOf(id) !== -1) return;
+  STATE.sectionsVisited.push(id);
+  awardXP(10);
+  if(id!=='constellation' && id!=='reflect'){ awardBadge(id); }
+  persist();
+}
+
+function renderHud(){
+  const lvl = levelFor(STATE.xp);
+  const next = xpForNextLevel(STATE.xp);
+  const pct = next ? clamp(((STATE.xp-lvl.floor)/(next-lvl.floor))*100,0,100) : 100;
+  const label = 'Lv.'+lvl.index+' '+lvl.title;
+
+  const navLevel = document.getElementById('navLevelLabel');
+  const navXp = document.getElementById('navXpFill');
+  const hudTitle = document.getElementById('hudLevelTitle');
+  const hudXpLabel = document.getElementById('hudXpLabel');
+  const hudXpFill = document.getElementById('hudXpFill');
+  if(navLevel) navLevel.textContent = label;
+  if(navXp) navXp.style.width = pct+'%';
+  if(hudTitle) hudTitle.textContent = label;
+  if(hudXpLabel) hudXpLabel.textContent = next ? (STATE.xp+' / '+next+' XP') : (STATE.xp+' XP \u00b7 max level');
+  if(hudXpFill) hudXpFill.style.width = pct+'%';
+
+  const grid = document.getElementById('badge-grid');
+  if(grid){
+    grid.innerHTML = '';
+    BADGES.forEach(function(b){
+      const el = document.createElement('div');
+      const earned = STATE.badges.indexOf(b.id) !== -1;
+      el.className = 'badge' + (earned?' earned':'');
+      el.setAttribute('data-label', b.label + (earned?'':' (locked)'));
+      el.textContent = b.glyph;
+      grid.appendChild(el);
+    });
+  }
+}
+
+function renderAnalyticsSummary(){
+  const el = document.getElementById('analytics-summary');
+  if(!el) return;
+  if(!STATE.analyticsOptIn){ el.textContent=''; return; }
+  const totalVisits = Object.values(STATE.analyticsCounts).reduce(function(a,b){return a+b;},0);
+  const sectionsSeen = Object.keys(STATE.analyticsCounts).length;
+  el.textContent = 'This device: '+totalVisits+' section view'+(totalVisits===1?'':'s')+' across '+sectionsSeen+' section'+(sectionsSeen===1?'':'s')+'.';
+}
+
+/* ---------------------------------------------------------------------
+   SPLASH SCREEN — animates the two waves toward phase-lock, then lets
+   the pure-CSS lifecycle (see @keyframes splashLifecycle) fade it out.
+   Returning visitors (flag persisted in IndexedDB) skip straight past
+   it instead of replaying the full sequence every visit.
+--------------------------------------------------------------------- */
+function setupSplash(){
+  const splash = document.getElementById('splash');
+  const skipBtn = document.getElementById('splashSkip');
+  if(!splash) return;
+  if(STATE.splashSeen){
+    splash.classList.add('js-instant');
+  } else {
+    STATE.splashSeen = true;
+    persist();
+    animateSplashWaves();
+  }
+  if(skipBtn){
+    skipBtn.addEventListener('click', function(){ splash.classList.add('js-skip'); });
+  }
+}
+
+function animateSplashWaves(){
+  if(prefersReducedMotion) return;
+  const a = document.getElementById('splashWaveA');
+  const b = document.getElementById('splashWaveB');
+  if(!a || !b) return;
+  const start = performance.now();
+  const duration = 3000;
+  function step(ts){
+    const t = clamp((ts-start)/duration, 0, 1);
+    const phase = Math.PI * (1-t);
+    a.setAttribute('d', wavePath(0));
+    b.setAttribute('d', wavePath(phase));
+    if(t<1) requestAnimationFrame(step);
+  }
+  function wavePath(offset){
+    let d='M0,60 ';
+    for(let x=0;x<=420;x+=15){
+      const y = 60 + 38*Math.sin((x/420)*Math.PI*2 + offset);
+      d += 'L'+x.toFixed(1)+','+y.toFixed(1)+' ';
+    }
+    return d;
+  }
+  requestAnimationFrame(step);
+}
+
+/* ---------------------------------------------------------------------
+   HERO BACKGROUND WAVES — a single static-but-offset pair of sine
+   paths (two systems not yet in phase). The only movement they get is
+   the scroll-driven parallax below; this keeps continuous animation
+   limited to the splash and the constellation, both of which respect
+   prefers-reduced-motion.
+--------------------------------------------------------------------- */
+function buildHeroWaves(){
+  const a = document.getElementById('heroWaveA');
+  const b = document.getElementById('heroWaveB');
+  if(!a || !b) return;
+  function pathFor(offset){
+    let d='M0,300 ';
+    for(let x=0;x<=1200;x+=25){
+      const y = 300 + 70*Math.sin((x/1200)*Math.PI*4 + offset);
+      d += 'L'+x+','+y.toFixed(1)+' ';
+    }
+    return d;
+  }
+  a.setAttribute('d', pathFor(0));
+  b.setAttribute('d', pathFor(1.15));
+}
+
+/* ---------------------------------------------------------------------
+   SCROLL EFFECTS — top progress bar + gentle parallax drift, both
+   updated in a single rAF-throttled scroll handler.
+--------------------------------------------------------------------- */
+function setupScrollEffects(){
+  const progressFill = document.getElementById('progressFill');
+  const parallaxEls = document.querySelectorAll('.parallax-el');
+  let ticking = false;
+  function update(){
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    if(progressFill) progressFill.style.width = (docH>0 ? clamp(scrollTop/docH,0,1)*100 : 0) + '%';
+    if(!prefersReducedMotion){
+      parallaxEls.forEach(function(el){
+        const factor = parseFloat(el.getAttribute('data-parallax')||'0.1');
+        el.style.transform = 'translateY('+(scrollTop*factor*-0.15).toFixed(1)+'px)';
+      });
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(update); ticking = true; }
+  }, {passive:true});
+  update();
+}
+
+/* ---------------------------------------------------------------------
+   SCROLLSPY — highlights the current section in the TOC panel.
+   Separate from the HUD's own section observer below, since this one
+   also tracks the hero and biases toward the upper third of the
+   viewport, which suits "what am I reading right now" rather than
+   "count this as read".
+--------------------------------------------------------------------- */
+function setupScrollspy(){
+  const sections = document.querySelectorAll('#main > section, #hero');
+  const tocLinks = document.querySelectorAll('#tocList a');
+  if(!sections.length || !tocLinks.length) return;
+  const obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        const id = entry.target.id;
+        tocLinks.forEach(function(l){ l.classList.toggle('active', l.getAttribute('data-target')===id); });
+      }
+    });
+  }, {threshold:0.2, rootMargin:'-15% 0px -55% 0px'});
+  sections.forEach(function(s){ obs.observe(s); });
+}
+
+/* ---------------------------------------------------------------------
+   HUD SECTION TRACKING — awards reading XP/badges the first time each
+   content section crosses 45% visible.
+--------------------------------------------------------------------- */
+function setupSectionTracking(){
+  const sections = document.querySelectorAll('[data-hud-section]');
+  if(!sections.length) return;
+  const obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting && entry.intersectionRatio>0.45){
+        markSectionVisited(entry.target.id);
+      }
+    });
+  }, {threshold:[0.45]});
+  sections.forEach(function(s){ obs.observe(s); });
+}
+
+function setupDeepDiveTracking(){
+  document.querySelectorAll('details.deep-dive').forEach(function(d,i){
+    const key = 'dd-'+i;
+    d.addEventListener('toggle', function(){
+      if(d.open && STATE.ddOpened.indexOf(key)===-1){
+        STATE.ddOpened.push(key);
+        awardXP(5);
+        persist();
+      }
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   TOC PANEL, HUD PANEL, SEARCH TOGGLE WIRING, RESET, TABS
+--------------------------------------------------------------------- */
+function setupTocPanel(){
+  const panel = document.getElementById('toc-panel');
+  const scrim = document.getElementById('toc-scrim');
+  const toggle = document.getElementById('tocToggle');
+  if(!panel || !scrim || !toggle) return;
+  function open(){ panel.classList.add('open'); scrim.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
+  function close(){ panel.classList.remove('open'); scrim.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
+  toggle.addEventListener('click', function(){ panel.classList.contains('open') ? close() : open(); });
+  scrim.addEventListener('click', close);
+  panel.querySelectorAll('a[data-target]').forEach(function(a){ a.addEventListener('click', close); });
+  window._closeToc = close;
+}
+
+function setupHudPanel(){
+  const panel = document.getElementById('hud-panel');
+  const fab = document.getElementById('hud-fab');
+  const compactBtn = document.getElementById('hudCompactBtn');
+  const closeBtn = document.getElementById('hudCloseBtn');
+  if(!panel || !fab) return;
+  function open(){ panel.classList.add('open'); fab.classList.add('open'); }
+  function close(){ panel.classList.remove('open'); fab.classList.remove('open'); }
+  fab.addEventListener('click', open);
+  if(compactBtn) compactBtn.addEventListener('click', open);
+  if(closeBtn) closeBtn.addEventListener('click', close);
+  window._closeHud = close;
+}
+
+function setupResetButtons(){
+  function doReset(){
+    const ok = window.confirm('Reset all locally saved progress, badges, and reflection answers on this device? This cannot be undone.');
+    if(!ok) return;
+    clearState().then(function(){
+      STATE = Object.assign({}, DEFAULT_STATE);
+      renderHud();
+      renderAnalyticsSummary();
+      const form = document.getElementById('reflect-form');
+      if(form) form.reset();
+      const resultBox = document.getElementById('reflect-result');
+      if(resultBox) resultBox.classList.remove('show');
+      const warn = document.getElementById('reflect-warning');
+      if(warn) warn.style.display = 'none';
+      selectedNode = null;
+      document.querySelectorAll('.node-chip').forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+      const infoBox = document.getElementById('constellation-info');
+      if(infoBox){
+        infoBox.innerHTML = '';
+        const p = document.createElement('p');
+        p.className = 'ci-placeholder';
+        p.textContent = 'Select a node above \u2014 a bond type or a mechanism \u2014 to see how it connects.';
+        infoBox.appendChild(p);
+      }
+      draw(performance.now());
+      const optIn = document.getElementById('analyticsOptIn');
+      if(optIn) optIn.checked = false;
+    });
+  }
+  const a = document.getElementById('resetProgressBtn');
+  const b = document.getElementById('footerResetLink');
+  if(a) a.addEventListener('click', doReset);
+  if(b) b.addEventListener('click', doReset);
+}
+
+function setupAnalyticsToggle(){
+  const box = document.getElementById('analyticsOptIn');
+  if(!box) return;
+  box.checked = !!STATE.analyticsOptIn;
+  renderAnalyticsSummary();
+  box.addEventListener('change', function(){
+    STATE.analyticsOptIn = box.checked;
+    if(!STATE.analyticsOptIn){ STATE.analyticsCounts = {}; }
+    persist();
+    renderAnalyticsSummary();
+  });
+}
+
+function setupTabs(){
+  const btns = document.querySelectorAll('.tab-btn');
+  if(!btns.length) return;
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btns.forEach(function(b){ b.setAttribute('aria-selected','false'); });
+      btn.setAttribute('aria-selected','true');
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.hidden = true; p.classList.remove('active'); });
+      const panel = document.getElementById(btn.getAttribute('data-tab'));
+      if(panel){ panel.hidden = false; panel.classList.add('active'); }
+    });
+  });
+}
+
+/* ---------------------------------------------------------------------
+   THE CONSTELLATION OF BONDS — canvas node graph.
+   Nodes are also exposed as ordinary buttons (the legend under the
+   canvas), which call the exact same selectNode() function, so every
+   interaction works with a keyboard or a screen reader with no loss
+   of function versus clicking the canvas directly.
+--------------------------------------------------------------------- */
+const MECH_NODES = [
+  {id:'oxytocin', label:'Oxytocin & vasopressin', type:'mech',
+    info:'Neuropeptides that shape social salience and reward around touch, trust, and proximity \u2014 more a volume dial on existing bonds than a trust potion on their own.'},
+  {id:'synchrony', label:'Neural synchrony', type:'mech',
+    info:'Measurable alignment of brain activity between two people, strongest when attention and emotion are genuinely shared rather than merely nearby.'},
+  {id:'coregulation', label:'Co-regulation', type:'mech',
+    info:'One nervous system helping another find calm \u2014 the mechanism behind social baseline theory and most trauma-informed practice.'},
+  {id:'mirroring', label:'Mirroring', type:'mech',
+    info:'Action- and emotion-matching processes that let one mind model another\u2019s \u2014 real, though narrower than the popular "mirror neuron" story suggests.'},
+  {id:'shared-attention', label:'Shared attention', type:'mech',
+    info:'Two minds pointed at the same thing at the same time \u2014 the simplest bonding mechanism to practice on purpose, and a building block for the rest.'}
+];
+
+const BOND_NODES = [
+  {id:'parent-infant', label:'Parent\u2013Infant', type:'bond', mech:['oxytocin','coregulation','mirroring','shared-attention'],
+    info:'The first bond, and the template every later one gets compared against \u2014 built from skin contact and gaze, with a caregiver\u2019s nervous system absorbing an infant\u2019s distress before the infant can regulate it alone.'},
+  {id:'romantic', label:'Romantic pair-bond', type:'bond', mech:['oxytocin','synchrony','coregulation'],
+    info:'Recruits the same reward circuitry mapped in prairie voles, layered under adult attachment behavior: proximity-seeking, distress at separation, a safe base for exploring the world.'},
+  {id:'sibling', label:'Sibling bond', type:'bond', mech:['mirroring','shared-attention','coregulation'],
+    info:'Often the longest relationship of a life, built less on caregiving than on shared reference points \u2014 the same household and the same events, seen from two vantage points at once.'},
+  {id:'friendship', label:'Friendship', type:'bond', mech:['synchrony','shared-attention','mirroring'],
+    info:'Chosen rather than assigned. Friends\u2019 brains have been shown to respond more similarly to the same video clips than strangers\u2019 brains do \u2014 measurable synchrony, not just a figure of speech.'},
+  {id:'therapeutic', label:'Therapeutic alliance', type:'bond', mech:['coregulation','synchrony'],
+    info:'The single strongest predictor of therapy outcomes across modalities \u2014 evidence that the relationship itself, not only the technique, is doing clinical work.'},
+  {id:'teacher-student', label:'Teacher\u2013student bond', type:'bond', mech:['shared-attention','coregulation','synchrony'],
+    info:'A second attachment relationship for children and adolescents. Classroom hyperscanning studies find higher teacher\u2013student neural synchrony during more engaged lessons.'},
+  {id:'community', label:'Community bond', type:'bond', mech:['shared-attention','synchrony'],
+    info:'Collective rituals \u2014 a concert, a protest, a shared meal \u2014 produce synchrony across many nervous systems at once, part of why they feel meaningful beyond their stated purpose.'},
+  {id:'human-animal', label:'Human\u2013animal bond', type:'bond', mech:['oxytocin','coregulation'],
+    info:'Mutual gaze between dogs and their owners raises oxytocin in both species \u2014 a bond built on the same chemistry as parent\u2013infant attachment, across a species line.'},
+  {id:'grief', label:'Grief (a broken bond)', type:'rupture', mech:['oxytocin','coregulation'],
+    info:'These same circuits in reverse: a nervous system still braced for another\u2019s presence, registering its absence as an ongoing alarm rather than a single event.'}
+];
+
+let canvas, cctx, cw=0, ch=0, selectedNode=null, rafId=null;
+
+function computeLayout(w,h){
+  const cx=w/2, cy=h/2;
+  const rOuter = Math.min(w,h)*0.40;
+  const rInner = Math.min(w,h)*0.17;
+  BOND_NODES.forEach(function(n,i){
+    const a = (i/BOND_NODES.length)*Math.PI*2 - Math.PI/2;
+    n.x = cx + rOuter*Math.cos(a);
+    n.y = cy + rOuter*Math.sin(a);
+  });
+  MECH_NODES.forEach(function(n,i){
+    const a = (i/MECH_NODES.length)*Math.PI*2 - Math.PI/2;
+    n.x = cx + rInner*Math.cos(a);
+    n.y = cy + rInner*Math.sin(a);
+  });
+}
+
+function nodeById(id){
+  return BOND_NODES.concat(MECH_NODES).find(function(n){ return n.id===id; });
+}
+
+function draw(ts){
+  if(!cctx) return;
+  cctx.clearRect(0,0,cw,ch);
+  const pulse = prefersReducedMotion ? 0.5 : (0.5 + 0.5*Math.sin((ts||0)/900));
+  BOND_NODES.forEach(function(b){
+    b.mech.forEach(function(mid){
+      const m = nodeById(mid);
+      if(!m) return;
+      const isActive = selectedNode && (selectedNode.id===b.id || selectedNode.id===mid);
+      const dim = selectedNode && !isActive;
+      cctx.beginPath();
+      cctx.moveTo(b.x,b.y); cctx.lineTo(m.x,m.y);
+      const baseAlpha = isActive ? (0.35+0.35*pulse) : (dim ? 0.08 : 0.16);
+      const hue = b.type==='rupture' ? '201,112,100' : '111,184,196';
+      cctx.strokeStyle = 'rgba('+hue+','+baseAlpha.toFixed(2)+')';
+      cctx.lineWidth = isActive ? 2 : 1;
+      cctx.stroke();
+    });
+  });
+  BOND_NODES.concat(MECH_NODES).forEach(function(n){
+    const visited = STATE.nodesVisited.indexOf(n.id)!==-1;
+    const isSel = selectedNode && selectedNode.id===n.id;
+    const isNeighbor = !!(selectedNode && ((selectedNode.mech && selectedNode.mech.indexOf(n.id)!==-1) || (n.mech && n.mech.indexOf(selectedNode.id)!==-1)));
+    const dim = selectedNode && !isSel && !isNeighbor;
+    const rad = n.type==='mech' ? 9 : 12;
+    cctx.beginPath();
+    cctx.arc(n.x,n.y,rad,0,Math.PI*2);
+    let fillAlpha = dim ? 0.25 : 0.92;
+    let hue = n.type==='rupture' ? '201,112,100' : (n.type==='mech' ? '111,184,196' : '232,168,92');
+    cctx.fillStyle = 'rgba('+hue+','+fillAlpha+')';
+    cctx.fill();
+    if(isSel){ cctx.lineWidth=2; cctx.strokeStyle='#ede7da'; cctx.stroke(); }
+    else if(visited){ cctx.lineWidth=1.5; cctx.strokeStyle='rgba(237,231,218,0.55)'; cctx.stroke(); }
+    cctx.fillStyle = dim ? 'rgba(185,179,164,0.35)' : '#ede7da';
+    cctx.font = (n.type==='mech'?'11px':'12px') + ' -apple-system, BlinkMacSystemFont, sans-serif';
+    cctx.textAlign = 'center';
+    const above = n.y < ch/2;
+    cctx.textBaseline = above ? 'bottom' : 'top';
+    cctx.fillText(n.label, n.x, n.y + (above? -rad-4 : rad+14));
+  });
+}
+
+function frame(ts){
+  draw(ts);
+  rafId = requestAnimationFrame(frame);
+}
+function startConstellationLoop(){
+  if(prefersReducedMotion){ draw(0); return; }
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(frame);
+}
+
+function resizeCanvas(){
+  if(!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  cw = rect.width; ch = rect.height || 520;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cw*dpr);
+  canvas.height = Math.round(ch*dpr);
+  cctx.setTransform(dpr,0,0,dpr,0,0);
+  computeLayout(cw,ch);
+  draw(performance.now());
+}
+
+function nodeAtPoint(x,y){
+  const all = BOND_NODES.concat(MECH_NODES);
+  for(let i=0;i<all.length;i++){
+    const n = all[i];
+    const rad = (n.type==='mech'?9:12) + 6;
+    const dx = x-n.x, dy = y-n.y;
+    if(dx*dx+dy*dy <= rad*rad) return n;
+  }
+  return null;
+}
+
+function selectNode(id){
+  if(!rateOk('node-'+id, 150)) return;
+  const n = nodeById(id);
+  if(!n) return;
+  selectedNode = n;
+  if(STATE.nodesVisited.indexOf(id)===-1){
+    STATE.nodesVisited.push(id);
+    awardXP(8);
+    const allIds = BOND_NODES.concat(MECH_NODES).map(function(x){ return x.id; });
+    if(allIds.every(function(x){ return STATE.nodesVisited.indexOf(x)!==-1; })){
+      awardBadge('constellation');
+    }
+    persist();
+  }
+  document.querySelectorAll('.node-chip').forEach(function(chip){
+    chip.setAttribute('aria-pressed', chip.getAttribute('data-node-id')===id ? 'true':'false');
+  });
+  const info = document.getElementById('constellation-info');
+  if(info){
+    info.innerHTML = '';
+    const title = document.createElement('p'); title.className='ci-title'; title.textContent = n.label;
+    const body = document.createElement('p'); body.textContent = n.info;
+    info.appendChild(title); info.appendChild(body);
+  }
+  if(!prefersReducedMotion){ draw(performance.now()); } else { draw(0); }
+}
+
+function buildLegend(){
+  const wrap = document.getElementById('constellation-legend');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  BOND_NODES.concat(MECH_NODES).forEach(function(n){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'node-chip' + (n.type==='mech'?' mech':'') + (n.type==='rupture'?' rupture':'');
+    btn.textContent = n.label;
+    btn.setAttribute('aria-pressed','false');
+    btn.setAttribute('role','listitem');
+    btn.setAttribute('data-node-id', n.id);
+    btn.addEventListener('click', function(){ selectNode(n.id); });
+    wrap.appendChild(btn);
+  });
+}
+
+function setupConstellationCanvas(){
+  canvas = document.getElementById('constellation-canvas');
+  if(!canvas) return;
+  cctx = canvas.getContext('2d');
+  canvas.addEventListener('click', function(e){
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const n = nodeAtPoint(x,y);
+    if(n) selectNode(n.id);
+  });
+  resizeCanvas();
+}
+
+/* ---------------------------------------------------------------------
+   REFLECTION TOOL — builds the five-point Likert scale for each item,
+   restores any previously saved answers, and on submit computes two
+   axis scores (comfort with closeness, worry about availability) and
+   plots them on the quadrant. All choice-based, so there is no free
+   text input here and effectively no injection surface to sanitize.
+--------------------------------------------------------------------- */
+const LIKERT_LABELS = ['Disagree','Slightly disagree','Neutral','Slightly agree','Agree'];
+
+function buildLikertInputs(){
+  const items = document.querySelectorAll('.reflect-item');
+  items.forEach(function(item, qi){
+    const group = item.querySelector('.likert');
+    if(!group) return;
+    LIKERT_LABELS.forEach(function(lab,i){
+      const val = i+1;
+      const id = 'q'+qi+'_'+val;
+      const input = document.createElement('input');
+      input.type='radio'; input.name='q'+qi; input.id=id; input.value=String(val);
+      const label = document.createElement('label');
+      label.setAttribute('for', id); label.textContent = lab;
+      group.appendChild(input); group.appendChild(label);
+    });
+  });
+  Object.keys(STATE.reflectAnswers).forEach(function(name){
+    const val = STATE.reflectAnswers[name];
+    const input = document.querySelector('input[name="'+name+'"][value="'+val+'"]');
+    if(input) input.checked = true;
+  });
+  const form = document.getElementById('reflect-form');
+  if(form){
+    const warn = document.createElement('p');
+    warn.id = 'reflect-warning';
+    warn.style.cssText = 'color:var(--rose);font-size:var(--step--1);display:none;margin-top:-.5rem;';
+    warn.textContent = 'Please answer every question \u2014 one or more are still blank.';
+    const ctaRow = form.querySelector('.cta-row');
+    if(ctaRow) form.insertBefore(warn, ctaRow);
+  }
+  if(STATE.reflectResult){ renderReflectResult(STATE.reflectResult); }
+}
+
+function computeReflectResult(){
+  const items = document.querySelectorAll('.reflect-item');
+  let closeSum=0, closeN=0, anxSum=0, anxN=0;
+  const answers = {};
+  items.forEach(function(item, qi){
+    const name = 'q'+qi;
+    const checked = item.querySelector('input:checked');
+    if(!checked) return;
+    const val = parseInt(checked.value,10);
+    const weight = parseFloat(item.getAttribute('data-weight'));
+    const effective = weight>0 ? val : (6-val);
+    answers[name] = checked.value;
+    if(item.getAttribute('data-axis')==='close'){ closeSum+=effective; closeN++; }
+    else { anxSum+=effective; anxN++; }
+  });
+  if(closeN+anxN < items.length) return null;
+  const closeAvg = closeSum/closeN, anxAvg = anxSum/anxN;
+  const x = 20 + ((closeAvg-1)/4)*180;
+  const y = 200 - ((anxAvg-1)/4)*180;
+  const closeHigh = closeAvg>=3, anxHigh = anxAvg>=3;
+  let label, copy;
+  if(closeHigh && !anxHigh){
+    label='Leans secure';
+    copy='Comfortable with closeness, and fairly settled about whether people will be there \u2014 the pattern research links to a steady early bond, or to one earned later on.';
+  } else if(closeHigh && anxHigh){
+    label='Leans anxious / preoccupied';
+    copy='At ease with closeness itself, but more attuned to whether it will be reciprocated \u2014 reassurance tends to help more here than distance does.';
+  } else if(!closeHigh && !anxHigh){
+    label='Leans dismissing / avoidant';
+    copy='Self-reliance feels safer than depending on others, without much worry about being left \u2014 closeness may need to build at its own pace.';
+  } else {
+    label='Leans fearful-avoidant';
+    copy='Wanting closeness and bracing against it at once \u2014 often the pattern when past bonds were both a comfort and a risk.';
+  }
+  return {x:x,y:y,label:label,copy:copy,answers:answers};
+}
+
+function renderReflectResult(result){
+  const box = document.getElementById('reflect-result');
+  const dot = document.getElementById('quadrantDot');
+  const leaning = document.getElementById('reflectLeaning');
+  const copyEl = document.getElementById('reflectCopy');
+  if(!box || !dot) return;
+  box.classList.add('show');
+  dot.setAttribute('cx', result.x);
+  dot.setAttribute('cy', result.y);
+  if(leaning) leaning.textContent = result.label;
+  if(copyEl) copyEl.textContent = result.copy;
+}
+
+function handleReflectSubmit(e){
+  e.preventDefault();
+  const warn = document.getElementById('reflect-warning');
+  const result = computeReflectResult();
+  if(!result){ if(warn) warn.style.display='block'; return; }
+  if(warn) warn.style.display='none';
+  STATE.reflectAnswers = result.answers;
+  STATE.reflectResult = {x:result.x, y:result.y, label:result.label, copy:result.copy};
+  awardXP(25);
+  awardBadge('reflect');
+  persist();
+  renderReflectResult(STATE.reflectResult);
+  const box = document.getElementById('reflect-result');
+  if(box) box.scrollIntoView({behavior: prefersReducedMotion?'auto':'smooth', block:'nearest'});
+}
+
+function setupReflectForm(){
+  const form = document.getElementById('reflect-form');
+  if(!form) return;
+  form.addEventListener('submit', handleReflectSubmit);
+  const resetBtn = document.getElementById('reflectResetBtn');
+  if(resetBtn){
+    resetBtn.addEventListener('click', function(){
+      form.reset();
+      const box = document.getElementById('reflect-result');
+      if(box) box.classList.remove('show');
+      STATE.reflectAnswers = {}; STATE.reflectResult = null;
+      persist();
+      const warn = document.getElementById('reflect-warning');
+      if(warn) warn.style.display='none';
+    });
+  }
+}
+
+/* ---------------------------------------------------------------------
+   SEARCH — a small, hand-curated index (rather than scraping the DOM
+   at runtime, which would also pull in nav chrome and HUD text). All
+   result rows are built with createElement/textContent, never innerHTML
+   with dynamic content, so there is no way user-typed input reaches
+   the page as markup.
+--------------------------------------------------------------------- */
+const SEARCH_INDEX = [
+  {id:'hero', title:'Resonance', text:'A field atlas of how humans bond, for policymakers, educators, and students.'},
+  {id:'neuroscience', title:'The neuroscience of resonance', text:'Limbic resonance, oxytocin, vasopressin, mirror neurons, interpersonal neural synchrony, hyperscanning, Lewis Amini Lannon, Hasson.'},
+  {id:'lifespan', title:'Attachment across the lifespan', text:'Bowlby, Ainsworth, the Strange Situation, secure anxious avoidant disorganized, adult attachment, earned secure attachment, Hazan Shaver, bereavement.'},
+  {id:'coregulation', title:'Co-regulation and the social baseline', text:'James Coan hand-holding study, social baseline theory, parenting, therapeutic alliance, polyvagal theory, Stephen Porges, Siegel Bryson.'},
+  {id:'constellation', title:'The constellation of bonds', text:'Parent-infant, romantic pair-bond, sibling, friendship, therapeutic alliance, teacher-student, community, human-animal bond, grief, oxytocin, synchrony, mirroring, shared attention.'},
+  {id:'fragmentation', title:'When resonance breaks', text:'Loneliness epidemic, Holt-Lunstad, Surgeon General Vivek Murthy, Minister for Loneliness, Tracey Crouch, Tetsushi Sakamoto, third places, Ray Oldenburg.'},
+  {id:'media-lens', title:'Engineered resonance', text:'Parasocial relationships, Horton and Wohl, variable ratio reinforcement, Skinner, dating apps, AI companions, attention economy, Center for Humane Technology.'},
+  {id:'toolkit', title:'Policy and practice toolkit', text:'Social prescribing, parental leave, third places, banking time, Robert Pianta, restorative practices, polyvagal classrooms, shared attention exercises.'},
+  {id:'reflect', title:'Explore your constellation', text:'Attachment style reflection, comfort with closeness, anxiety about availability, secure anxious avoidant fearful, quadrant.'},
+  {id:'evidence', title:'Evidence library', text:'Bowlby, Ainsworth, Lewis Amini Lannon, Carter, Young, Hasson, Coan, Porges, Hazan, Shaver, Holt-Lunstad, Oldenburg, Pianta, Horton, Wohl.'}
+];
+
+function buildResultRow(entry, query){
+  const a = document.createElement('a');
+  a.href = '#'+entry.id;
+  const secLabel = document.createElement('span');
+  secLabel.className = 'r-section';
+  secLabel.textContent = entry.title;
+  a.appendChild(secLabel);
+  const snippet = entry.text.length>115 ? entry.text.slice(0,115)+'\u2026' : entry.text;
+  const q = (query||'').trim().toLowerCase();
+  if(q){
+    const idx = snippet.toLowerCase().indexOf(q);
+    if(idx>=0){
+      a.appendChild(document.createTextNode(snippet.slice(0,idx)));
+      const mark = document.createElement('mark');
+      mark.textContent = snippet.slice(idx, idx+q.length);
+      a.appendChild(mark);
+      a.appendChild(document.createTextNode(snippet.slice(idx+q.length)));
+    } else {
+      a.appendChild(document.createTextNode(snippet));
+    }
+  } else {
+    a.appendChild(document.createTextNode(snippet));
+  }
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    closeSearch();
+    const target = document.getElementById(entry.id);
+    if(target) target.scrollIntoView({behavior: prefersReducedMotion?'auto':'smooth', block:'start'});
+    history.replaceState(null,'','#'+entry.id);
+  });
+  return a;
+}
+
+function runSearch(query){
+  const results = document.getElementById('search-results');
+  if(!results) return;
+  results.innerHTML = '';
+  const q = (query||'').trim().toLowerCase();
+  if(!q) return;
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const scored = SEARCH_INDEX.map(function(entry){
+    const hay = (entry.title+' '+entry.text).toLowerCase();
+    let score = 0;
+    tokens.forEach(function(t){
+      if(entry.title.toLowerCase().indexOf(t)!==-1) score += 3;
+      score += hay.split(t).length - 1;
+    });
+    return {entry:entry, score:score};
+  }).filter(function(r){ return r.score>0; }).sort(function(a,b){ return b.score-a.score; });
+
+  if(!scored.length){
+    const p = document.createElement('p');
+    p.id = 'search-empty';
+    p.textContent = 'No matches \u2014 try a different term.';
+    results.appendChild(p);
+    return;
+  }
+  scored.slice(0,8).forEach(function(r){ results.appendChild(buildResultRow(r.entry, tokens[0]||'')); });
+}
+
+function openSearch(){
+  const overlay = document.getElementById('search-overlay');
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  if(!overlay || !input) return;
+  overlay.classList.add('open');
+  document.body.classList.add('no-scroll');
+  input.value = '';
+  if(results) results.innerHTML = '';
+  setTimeout(function(){ input.focus(); }, 60);
+}
+function closeSearch(){
+  const overlay = document.getElementById('search-overlay');
+  if(!overlay) return;
+  overlay.classList.remove('open');
+  document.body.classList.remove('no-scroll');
+}
+function setupSearch(){
+  const overlay = document.getElementById('search-overlay');
+  const input = document.getElementById('search-input');
+  const toggle = document.getElementById('searchToggle');
+  if(!overlay || !input || !toggle) return;
+  toggle.addEventListener('click', openSearch);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) closeSearch(); });
+  input.addEventListener('input', debounce(function(e){ runSearch(e.target.value); }, 160));
+}
+
+/* ---------------------------------------------------------------------
+   PRINT HANDLING — force every collapsible open for the duration of
+   printing, then restore whatever state the reader had before.
+--------------------------------------------------------------------- */
+function setupPrintHandling(){
+  let openedByPrint = [];
+  window.addEventListener('beforeprint', function(){
+    openedByPrint = [];
+    document.querySelectorAll('details:not([open])').forEach(function(d){ d.open = true; openedByPrint.push(d); });
+  });
+  window.addEventListener('afterprint', function(){
+    openedByPrint.forEach(function(d){ d.open = false; });
+    openedByPrint = [];
+  });
+}
+
+/* ---------------------------------------------------------------------
+   INIT — restores saved state, then wires up every module. Runs once
+   the DOM is ready (the script tag sits at the end of body, so in
+   practice the DOM is already parsed, but the check is kept for
+   robustness if this file is ever restructured).
+--------------------------------------------------------------------- */
+function init(){
+  loadState().then(function(saved){
+    STATE = Object.assign({}, DEFAULT_STATE, saved);
+
+    setupSplash();
+    buildHeroWaves();
+    setupScrollEffects();
+    setupScrollspy();
+    setupSectionTracking();
+    setupDeepDiveTracking();
+    setupTocPanel();
+    setupHudPanel();
+    setupResetButtons();
+    setupAnalyticsToggle();
+    setupTabs();
+    setupSearch();
+    setupConstellationCanvas();
+    buildLegend();
+    startConstellationLoop();
+    buildLikertInputs();
+    setupReflectForm();
+    setupPrintHandling();
+    renderHud();
+
+    STATE.lastVisit = new Date().toISOString();
+    persist();
+
+    window.addEventListener('resize', debounce(resizeCanvas, 200));
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        closeSearch();
+        if(window._closeToc) window._closeToc();
+        if(window._closeHud) window._closeHud();
+      }
+    });
+  });
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+</body>
+</html>
